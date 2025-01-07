@@ -1,6 +1,6 @@
 # CodeBeaver
 
-Get to 100% Unit Test Coverage in 2 clicks
+Get to 95% Unit Test Coverage in 2 clicks
 
 > #### We are currently in **Private Beta**. If you are not on the waitlist, please [join the waitlist](https://www.codebeaver.ai/) to get an invite.
 
