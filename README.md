@@ -2,17 +2,18 @@
 
 Get to 100% Unit Test Coverage in 2 clicks
 
-> #### We are currently in **Private Beta**. If you are not on the waitlist, please [join the waitlist](https://www.codebeaver.ai/) to get an invite.
-
 ## What is CodeBeaver?
 
 **CodeBeaver** is an A.I. agent that writes and runs unit tests. You can connect it to your Github or Gitlab repository and it will write unit tests for your code until you get to 100% coverage.
 
-Developers can interact with the A.I. agent via comments on Pull Requests by adding `@codebeaver` to the comment. You can aslo add a `codebeaver.yaml` file to your repository to configure the test pipeline.
+Developers can interact with the A.I. agent via comments on Pull Requests by adding `@codebeaver` to the comment. You can also add a `codebeaver.yaml` file to your repository to configure the test pipeline.
 
 ## Quickstart
 
-Once you have an invite to join the private Beta, you can connect your Github or Gitlab repository to CodeBeaver. Follow the link in the email invite to create an account on CodeBeaver. There, you can create an account by clicking on "Sign up with Github" or "Sign up with Gitlab" button.
+1. Visit [CodeBeaver](https://www.codebeaver.ai)
+2. Authenticate using your GitHub or Bitbucket credentials
+3. Follow the guided setup to grant CodeBeaver access to your organization/workspace
+4. Select the repositories you want to enable CodeBeaver for
 
 ## Integrations with GitHub and GitLab
 
@@ -29,5 +30,5 @@ By default, CodeBeaer will ask you to add a repository to your account. You can 
 
 ## Need help?
 
-- You can join the **Discord community** to get help from the community and the team. You will find the link in the email invite.
-- Contact us at [support@codebeaver.ai](mailto:support@codebeaver.ai)
+- You can join the [Discord community](https://discord.gg/4QMwWdsMGt) to get help from the community and the team. You will find the link in the email invite.
+- Contact us at [info@codebeaver.ai](mailto:info@codebeaver.ai)
