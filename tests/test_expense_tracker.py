@@ -22,10 +22,13 @@ class TestExpenseTracker(unittest.TestCase):
         self.assertEqual(len(tracker.expenses), 0)
 
     def test_categories_is_set_with_default_categories(self):
+        """
+        Test that the ExpenseTracker is initialized with the correct default categories.
+        """
         tracker = ExpenseTracker()
         self.assertIsInstance(tracker.categories, set)
         expected_categories = {
-            "foods",
+            "food",
             "transport",
             "utilities",
             "entertainment",
@@ -52,13 +55,16 @@ class TestExpenseTracker(unittest.TestCase):
         self.assertEqual(len(tracker.expenses), 0)
 
     def test_remove_category(self):
+        """
+        Test that removing a category reduces the total number of categories by one.
+        """
         tracker = ExpenseTracker()
         initial_category_count = len(tracker.categories)
         category_to_remove = "entertainment"
 
         tracker.categories.remove(category_to_remove)
 
-        self.assertEqual(len(tracker.categories), initial_category_count)
+        self.assertEqual(len(tracker.categories), initial_category_count - 1)
         self.assertNotIn(category_to_remove, tracker.categories)
         self.assertEqual(len(tracker.expenses), 0)  # Ensure expenses are still empty
 
