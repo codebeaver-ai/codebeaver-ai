@@ -2,7 +2,6 @@ import unittest
 
 from expense_tracker import ExpenseTracker
 
-
 class TestExpenseTracker(unittest.TestCase):
     def test_expense_tracker_initialization(self):
         tracker = ExpenseTracker()
@@ -22,10 +21,13 @@ class TestExpenseTracker(unittest.TestCase):
         self.assertEqual(len(tracker.expenses), 0)
 
     def test_categories_is_set_with_default_categories(self):
+        """
+        Test that the ExpenseTracker is initialized with the correct default categories.
+        """
         tracker = ExpenseTracker()
         self.assertIsInstance(tracker.categories, set)
         expected_categories = {
-            "foods",
+            "food",
             "transport",
             "utilities",
             "entertainment",
@@ -52,13 +54,16 @@ class TestExpenseTracker(unittest.TestCase):
         self.assertEqual(len(tracker.expenses), 0)
 
     def test_remove_category(self):
+        """
+        Test that removing a category reduces the total number of categories by one.
+        """
         tracker = ExpenseTracker()
         initial_category_count = len(tracker.categories)
         category_to_remove = "entertainment"
 
         tracker.categories.remove(category_to_remove)
 
-        self.assertEqual(len(tracker.categories), initial_category_count)
+        self.assertEqual(len(tracker.categories), initial_category_count - 1)
         self.assertNotIn(category_to_remove, tracker.categories)
         self.assertEqual(len(tracker.expenses), 0)  # Ensure expenses are still empty
 
@@ -123,3 +128,30 @@ class TestExpenseTracker(unittest.TestCase):
 
         # Ensure expenses weren't affected
         self.assertEqual(len(tracker.expenses), 0)
+
+    def test_total_expense_by_category(self):
+        """
+        Test that the total_expense_by_category method correctly calculates
+        the sum of expenses for a given category.
+        """
+        tracker = ExpenseTracker()
+
+        # Add some test expenses
+        tracker.expenses = [
+            {"amount": 50.0, "category": "food"},
+            {"amount": 30.0, "category": "food"},
+            {"amount": 20.0, "category": "transport"},
+            {"amount": 100.0, "category": "food"},
+        ]
+
+        # Test for food category
+        self.assertEqual(tracker.total_expense_by_category("food"), 180.0)
+
+        # Test for transport category
+        self.assertEqual(tracker.total_expense_by_category("transport"), 20.0)
+
+        # Test for a category with no expenses
+        self.assertEqual(tracker.total_expense_by_category("entertainment"), 0.0)
+
+        # Test case insensitivity
+        self.assertEqual(tracker.total_expense_by_category("FOOD"), 180.0)
