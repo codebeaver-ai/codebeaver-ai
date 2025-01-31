@@ -2,7 +2,6 @@ import unittest
 
 from expense_tracker import ExpenseTracker
 
-
 class TestExpenseTracker(unittest.TestCase):
     def test_expense_tracker_initialization(self):
         tracker = ExpenseTracker()
@@ -129,3 +128,30 @@ class TestExpenseTracker(unittest.TestCase):
 
         # Ensure expenses weren't affected
         self.assertEqual(len(tracker.expenses), 0)
+
+    def test_total_expense_by_category(self):
+        """
+        Test that the total_expense_by_category method correctly calculates
+        the sum of expenses for a given category.
+        """
+        tracker = ExpenseTracker()
+
+        # Add some test expenses
+        tracker.expenses = [
+            {"amount": 50.0, "category": "food"},
+            {"amount": 30.0, "category": "food"},
+            {"amount": 20.0, "category": "transport"},
+            {"amount": 100.0, "category": "food"},
+        ]
+
+        # Test for food category
+        self.assertEqual(tracker.total_expense_by_category("food"), 180.0)
+
+        # Test for transport category
+        self.assertEqual(tracker.total_expense_by_category("transport"), 20.0)
+
+        # Test for a category with no expenses
+        self.assertEqual(tracker.total_expense_by_category("entertainment"), 0.0)
+
+        # Test case insensitivity
+        self.assertEqual(tracker.total_expense_by_category("FOOD"), 180.0)
