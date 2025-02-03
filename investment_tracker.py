@@ -10,7 +10,20 @@ class InvestmentTracker:
         )
 
     def record_transaction(self, amount, category, description):
-        """Add a new expense to the tracker."""
+        """
+        Add a new expense to the tracker.
+
+        Args:
+            amount (int, float): The amount of the expense.
+            category (str): The category of the expense.
+            description (str): The description of the expense.
+
+        Returns:
+            bool: True if the expense was added successfully, False otherwise.
+
+        Raises:
+            ValueError: If the amount is not a positive number or the category is not in the categories set.
+        """
         if not isinstance(amount, (int, float)) or amount <= 0:
             raise ValueError("Amount must be a positive number")
 
@@ -26,11 +39,27 @@ class InvestmentTracker:
         return True
 
     def calculate_overall_spending(self):
-        """Calculate total expenses."""
+        """
+        Calculate total expenses by summing up all the amounts in the expenses list.
+
+        Returns:
+            float: The total expenses.
+        """
         return sum(expense["amount"] for expense in self.expenses)
 
     def filter_by_category(self, category):
-        """Get all expenses for a specific category."""
+        """
+        Get all expenses for a specific category.
+
+        Args:
+            category (str): The category to filter by.
+
+        Returns:
+            list: A list of expenses for the specific category.
+
+        Raises:
+            ValueError: If the category is not in the categories set.
+        """
         if category.lower() not in self.categories:
             raise ValueError(f"Category must be one of: {', '.join(self.categories)}")
 
@@ -51,18 +80,23 @@ class InvestmentTracker:
             if expense["category"] == category.lower()
         )
 
-    def register_new_category(self, category):
+    def register_new_category(self, category) -> bool:
         """
         Add a new expense category.
-        - If the category is a an empty string, return None.
-        - If it's not a string, raise a ValueError.
-        - If the category is already in the categories set, return False.
-        - Otherwise, add the category to the categories set and return True.
+
+        Args:
+            category (str): The category to add.
+
+        Returns:
+            bool: True if the category was added successfully, False otherwise.
+
+        Raises:
+            ValueError: If the category is not a string or is an empty string.
         """
         if not isinstance(category, str) or not category.strip():
             raise ValueError("Category must be a non-empty string")
 
-        category = category.lower().strip()
+        category = category.strip()
         if category in self.categories:
             return False
 
