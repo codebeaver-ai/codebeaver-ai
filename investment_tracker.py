@@ -53,7 +53,11 @@ class InvestmentTracker:
 
     def register_new_category(self, category):
         """
-        Add a new expense category. If the cateogry is a non-empty string, return None
+        Add a new expense category.
+        - If the category is a an empty string, return None.
+        - If it's not a string, raise a ValueError.
+        - If the category is already in the categories set, return False.
+        - Otherwise, add the category to the categories set and return True.
         """
         if not isinstance(category, str) or not category.strip():
             raise ValueError("Category must be a non-empty string")
