@@ -12,6 +12,13 @@ Get Unit Tests with every push.
 - Keeping your test suite up-to-date as your code evolves
 - Adding edge cases you might have missed
 
+## See it in action
+
+Want to see the magic? Check out these real examples from our Pull Requests:
+
+- [CodeBeaver discovers a bug and explains where the problem is](https://github.com/codebeaver-ai/codebeaver-ai/pull/8)
+- [CodeBeaver updates a test given the new code commited](https://github.com/codebeaver-ai/codebeaver-ai/pull/12)
+
 ## Try it yourself
 
 Got a project in mind? Let's see CodeBeaver in action with your code:
