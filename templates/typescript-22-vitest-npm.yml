@@ -23,7 +23,7 @@ setup_commands:
   - npm install -D @testing-library/user-event
   - npm install -D jsdom
   - "[ -f tsconfig.json ] || echo '{\"compilerOptions\":{\"target\":\"es5\",\"module\":\"commonjs\",\"strict\":true,\"esModuleInterop\":true,\"skipLibCheck\":true,\"forceConsistentCasingInFileNames\":true,\"jsx\":\"react-jsx\",\"types\":[\"jest\",\"node\"]}}' > tsconfig.json"
-  - "[ -f babel.config.js ] || echo 'module.exports={presets:[[\"@babel/preset-env\",{targets:{node:\"current\"}}],\"@babel/preset-typescript\",\"@babel/preset-react\"]}' > babel.config.js"
+  - '[ -f babel.config.js ] || echo ''module.exports={presets:[["@babel/preset-env",{targets:{node:"current"}}],"@babel/preset-typescript",["@babel/preset-react",{runtime:"automatic"}]]}'' > babel.config.js'
 ignore:
   - "*prettierrc*"
   - "*eslintrc*"
@@ -35,3 +35,4 @@ ignore:
   - "*.config.js"
   - "*.config.ts"
   - "*.config.jsx"
+  - "*.d.ts"

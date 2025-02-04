@@ -21,7 +21,7 @@ setup_commands:
   - pnpm add --silent @testing-library/jest-dom
   - pnpm add --silent @testing-library/user-event
   - pnpm add --silent jest-environment-jsdom
-  - "[ -f babel.config.js ] || echo 'module.exports={presets:[[\"@babel/preset-env\",{targets:{node:\"current\"}}],\"@babel/preset-react\"]}' > babel.config.js"
+  - '[ -f babel.config.js ] || echo ''module.exports={presets:[["@babel/preset-env",{targets:{node:"current"}}],"@babel/preset-typescript",["@babel/preset-react",{runtime:"automatic"}]]}'' > babel.config.js'
   - "[ -f jest.config.js ] || echo 'module.exports={testEnvironment:\"jsdom\",transform:{\".+\\\\.(js|jsx)$\":\"babel-jest\"}}' > jest.config.js"
 ignore:
   - "*prettierrc*"
