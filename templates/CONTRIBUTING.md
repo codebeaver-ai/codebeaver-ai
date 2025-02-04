@@ -8,7 +8,7 @@ Welcome! We're excited that you want to contribute to CodeBeaver Templates. This
 2. Clone your fork:
 
 ````bash
-git clone git@github.com:codebeaver-ai/codebeaver-templates.git
+git clone git@github.com:codebeaver-ai/codebeaver-ai.git
 
 Copy
 

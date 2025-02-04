@@ -1,0 +1,42 @@
+main_service: node
+services:
+  node:
+    image: node:18-slim
+test_commands:
+  - "npx jest --coverage --coverageReporters=json --json --outputFile=jest-results.json --collectCoverageFrom='**/*.{js,jsx,ts,tsx}' --coveragePathIgnorePatterns='node_modules' --passWithNoTests || [ $? -eq 1 -o $? -eq 5 ]"
+  - "if [ -f 'coverage/coverage-final.json' ]; then mv coverage/coverage-final.json coverage.json; else echo 'Warn: coverage/coverage-final.json not found'; exit 1; fi"
+single_file_test_commands:
+  - "npx jest --coverage --coverageReporters=json --json --outputFile=jest-results.json --testPathPattern=$TEST_FILE --collectCoverageFrom=$TO_BE_COVERED_FILE --passWithNoTests || [ $? -eq 1 -o $? -eq 5 ]"
+  - "if [ -f 'coverage/coverage-final.json' ]; then mv coverage/coverage-final.json coverage.json; else echo 'Warn: coverage/coverage-final.json not found'; exit 1; fi"
+setup_commands:
+  - npm install -g pnpm
+  - pnpm install --silent || true
+  - pnpm add -D --silent typescript
+  - pnpm add -D --silent @types/jest
+  - pnpm add -D --silent ts-jest
+  - pnpm add -D --silent jest
+  - pnpm add -D --silent ts-node
+  - pnpm add -D --silent jest-json-reporter
+  - pnpm add -D --silent babel
+  - pnpm add -D --silent @babel/core
+  - pnpm add -D --silent @babel/preset-typescript
+  - pnpm add -D --silent @babel/preset-react
+  - pnpm add -D --silent @babel/preset-env
+  - pnpm add -D --silent @testing-library/react
+  - pnpm add -D --silent @testing-library/jest-dom
+  - pnpm add -D --silent @testing-library/user-event
+  - pnpm add -D --silent jest-environment-jsdom
+  - '[ -f jest.config.js ] || echo ''module.exports={testEnvironment:"jsdom"}'' > jest.config.js'
+  - '[ -f tsconfig.json ] || echo ''{"compilerOptions":{"target":"es5","module":"commonjs","strict":true,"esModuleInterop":true,"skipLibCheck":true,"forceConsistentCasingInFileNames":true,"jsx":"react-jsx","types":["jest","node"]}}'' > tsconfig.json'
+  - '[ -f babel.config.js ] || echo ''module.exports={presets:[["@babel/preset-env",{targets:{node:"current"}}],"@babel/preset-typescript","@babel/preset-react"]}'' > babel.config.js'
+ignore:
+  - "*prettierrc*"
+  - "*eslintrc*"
+  - "*stylelintrc*"
+  - "*commitlintrc*"
+  - "*lintstagedrc*"
+  - "*huskyrc*"
+  - "*config.test.*"
+  - "*.config.js"
+  - "*.config.ts"
+  - "*.config.jsx"

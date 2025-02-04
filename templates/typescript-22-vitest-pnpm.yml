@@ -1,0 +1,38 @@
+main_service: node
+services:
+  node:
+    image: node:22.13.1-slim
+test_commands:
+  - 'npx vitest run --coverage.include="**/*.{js,jsx,ts,tsx}" --coverage.all=true --reporter=json --outputFile=vitest-results.json'
+  - 'if [ -f "coverage/coverage-final.json" ]; then mv coverage/coverage-final.json coverage.json; else echo "Warn: coverage/coverage-final.json not found"; exit 1; fi'
+single_file_test_commands:
+  - "npx vitest run --coverage $TEST_FILE --reporter=json --outputFile=vitest-results.json"
+  - 'if [ -f "coverage/coverage-final.json" ]; then mv coverage/coverage-final.json coverage.json; else echo "Warn: coverage/coverage-final.json not found"; exit 1; fi'
+setup_commands:
+  - npm install -g pnpm
+  - pnpm install
+  - pnpm add -D typescript
+  - pnpm add -D @types/node
+  - pnpm add -D vitest@latest
+  - pnpm add -D @vitest/coverage-v8@latest
+  - pnpm add -D @babel/core
+  - pnpm add -D @babel/preset-typescript
+  - pnpm add -D @babel/preset-react
+  - pnpm add -D @babel/preset-env
+  - pnpm add -D @testing-library/react
+  - pnpm add -D @testing-library/jest-dom
+  - pnpm add -D @testing-library/user-event
+  - pnpm add -D jsdom
+  - "[ -f tsconfig.json ] || echo '{\"compilerOptions\":{\"target\":\"es5\",\"module\":\"commonjs\",\"strict\":true,\"esModuleInterop\":true,\"skipLibCheck\":true,\"forceConsistentCasingInFileNames\":true,\"jsx\":\"react-jsx\",\"types\":[\"jest\",\"node\"]}}' > tsconfig.json"
+  - "[ -f babel.config.js ] || echo 'module.exports={presets:[[\"@babel/preset-env\",{targets:{node:\"current\"}}],\"@babel/preset-typescript\",\"@babel/preset-react\"]}' > babel.config.js"
+ignore:
+  - "*prettierrc*"
+  - "*eslintrc*"
+  - "*stylelintrc*"
+  - "*commitlintrc*"
+  - "*lintstagedrc*"
+  - "*huskyrc*"
+  - "*config.test.*"
+  - "*.config.js"
+  - "*.config.ts"
+  - "*.config.jsx"
