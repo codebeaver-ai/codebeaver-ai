@@ -4,69 +4,43 @@ Welcome! We're excited that you want to contribute to CodeBeaver Templates. This
 
 ## Getting Started
 
-1. Fork the repository
-2. Clone your fork:
+1. Fork this repository
+2. Add a new template file
+3. Open a pull request
 
-````bash
-git clone git@github.com:codebeaver-ai/codebeaver-ai.git
-
-Copy
-
-Apply
-
-CONTRIBUTING.md
-3. Create a new branch for your changes:
-```bash
-git checkout -b template/your-template-name
-
-Copy
-
-Apply
-
-CONTRIBUTING.md
 ## Adding New Templates
 
 When adding a new template:
 
-1. Check if your framework already exists under the `templates/` folder. If not, add a new directory under `templates/` with your framework name.
-2. Add a new template file with the base configuration. Possible naming configurations:
+1. Make sure that the framework/language is not already present. Feel free to drop into our [Discord](https://discord.gg/4QMwWdsMGt) if you have any questions.
+2. Read [the documentation about templates](https://docs.codebeaver.ai/configuration#using-templates)
+3. Write a template and test it out (see below for how to test it)
+4. Add the new template file. Try to respect the following naming conventions:
    - {framework}.yml -> `pytest.yml`
    - {language}-{framework}.yml -> `python-pytest.yml`
    - {language}-{version}-{framework}.yml -> `python-3.11-pytest.yml`
    - {language}-{shortened-version}-{framework}.yml -> `node-22-vitest.yml`
    - {language}-{version/shortened-version}-{framework}-{package_manager}.yml -> `node-22-vitest-yarn.yml`
-3. Update the list of supported templates in the template directory's README.md
+5. Open a Pull Request
+6. You are done!
 
-## Template Guidelines
-- Keep templates minimal but functional
-- Include only necessary services and dependencies
-- Document environment variables clearly
+Once your PR is merged, anybody will be able to use your template in their CodeBeaver projects.
 
-## Testing Your Changes
-1. Test your template with various project structures
-2. Verify all commands work in isolation
-3. Ensure proper service dependencies
-4. Check environment variable propagation
+## Testing Your Template
 
-## Submitting Changes
-1. Push your changes to your fork
-2. Create a Pull Request with:
-    - Clear description of the template's structure
-    - Example usage
-    - If possible, include a link to a sample project for testing
-    - Updates to documentation
+To test your changes, you can:
 
-## Code Review Process
-1. Maintainers will review your PR
-2. Address any feedback or requested changes
-3. Once approved, your template will be merged
+- Create a new Open source repository (here on GitHub or on the Git provider you prefer)
+- Use your whole template as the `codebeaver.yml` file for the new repository
+- Put some test code in the repository (or your whole code!)
+- Open a Pull Request or use a [trigger](https://docs.codebeaver.ai/features/triggers) to test it out
 
 ## Community
+
 - [Join our Discord community for discussions](https://discord.gg/4QMwWdsMGt)
 - Report issues through GitHub Issues
-- Contact the team at info@codebeaver.ai
+- Contact the team at [info@codebeaver.ai](mailto:info@codebeaver.ai)
 
 ## License
-By contributing, you agree that your contributions will be licensed under the same license as the project.
 
-Thank you for contributing to CodeBeaver Templates!
+By contributing, you agree that your contributions will be licensed under the MIT license (same as the other templates).
