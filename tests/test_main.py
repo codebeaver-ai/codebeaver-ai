@@ -2,6 +2,10 @@ from fastapi.testclient import TestClient
 import pytest
 from app.main import app
 
+
+
+
+
 client = TestClient(app)
 
 
@@ -39,3 +43,45 @@ def test_list_books():
     books = response.json()
     assert len(books) > 0
     assert isinstance(books, list)
+
+
+def test_borrow_and_return_book():
+    """
+    Test the book borrowing and returning functionality.
+    This test covers:
+    1. Creating a new book
+    2. Borrowing the book
+    3. Attempting to borrow an already borrowed book
+    4. Returning the book
+    5. Attempting to return an available book
+    """
+    # Create a new book
+    book_data = {
+        "title": "To Kill a Mockingbird",
+        "author": "Harper Lee",
+        "published_year": 1960,
+    }
+    response = client.post("/books/", json=book_data)
+    assert response.status_code == 200
+    created_book = response.json()
+    book_id = created_book["id"]
+
+    # Borrow the book
+    response = client.put(f"/books/{book_id}/borrow")
+    assert response.status_code == 200
+    assert response.json() == {"message": "Book borrowed successfully"}
+
+    # Try to borrow the same book again (should fail)
+    response = client.put(f"/books/{book_id}/borrow")
+    assert response.status_code == 400
+    assert response.json() == {"detail": "Book is already borrowed"}
+
+    # Return the book
+    response = client.put(f"/books/{book_id}/return")
+    assert response.status_code == 200
+    assert response.json() == {"message": "Book returned successfully"}
+
+    # Try to return the book again (should fail)
+    response = client.put(f"/books/{book_id}/return")
+    assert response.status_code == 400
+    assert response.json() == {"detail": "Book is not borrowed"}
