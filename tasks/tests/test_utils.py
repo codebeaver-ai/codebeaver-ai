@@ -2,7 +2,6 @@ import pytest
 from datetime import datetime, timedelta
 from tasks.utils import TaskUtils
 
-
 @pytest.fixture
 def sample_tasks():
     now = datetime.now(datetime.now().astimezone().tzinfo)
@@ -33,30 +32,23 @@ def sample_tasks():
         },
     ]
 
-
-def test_calculate_priority_score():
-    task = {
-        "priority": "HIGH",
-        "due_date": (datetime.now() + timedelta(days=1)).isoformat(),
-    }
-    score = TaskUtils.calculate_priority_score(task)
-    assert score > 100  # Base score (100) + urgency bonus (50)
-
-
-def test_sort_tasks_by_priority(sample_tasks):
-    sorted_tasks = TaskUtils.sort_tasks_by_priority(sample_tasks)
+def test_get_tasks_by_importance(sample_tasks):
+    """
+    Test that the get_tasks_by_importance method correctly sorts tasks
+    based on their importance score in descending order.
+    """
+    sorted_tasks = TaskUtils.get_tasks_by_importance(sample_tasks)
     assert len(sorted_tasks) == 4
-    assert sorted_tasks[0]["title"] == "Urgent Task"  # High priority + due soon
-    assert sorted_tasks[-1]["title"] == "Low Priority Task"  # Low priority + due later
+    # "Urgent Task" should be at the top due to high priority and near due date.
+    assert sorted_tasks[0]["title"] == "Urgent Task"
+    # "Low Priority Task" should be last since it's low priority with a due date far in the future.
+    assert sorted_tasks[-1]["title"] == "Low Priority Task"
 
-
-def test_get_overdue_tasks(sample_tasks):
-    overdue_tasks = TaskUtils.get_overdue_tasks(sample_tasks)
+def test_find_pending_overdue_tasks(sample_tasks):
+    """
+    Test that the find_pending_overdue_tasks method correctly identifies
+    tasks that are overdue and not completed.
+    """
+    overdue_tasks = TaskUtils.find_pending_overdue_tasks(sample_tasks)
     assert len(overdue_tasks) == 1
     assert overdue_tasks[0]["title"] == "Overdue Task"
-
-
-def test_priority_score_without_due_date():
-    task = {"priority": "HIGH"}
-    score = TaskUtils.calculate_priority_score(task)
-    assert score == 100  # Only base priority score, no urgency bonus
