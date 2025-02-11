@@ -1,0 +1,35 @@
+.app {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+h1 {
+  text-align: center;
+  color: #333;
+  margin-bottom: 2rem;
+}
+
+.component-section {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  border: 1px solid #eee;
+  border-radius: 8px;
+}
+
+h2 {
+  color: #666;
+  margin-bottom: 1rem;
+}
+
+.button-container {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.dropdown-container {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
+}
