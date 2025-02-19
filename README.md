@@ -1,8 +1,13 @@
-# CodeBeaver
+ <div align="center">
+ <picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://www.codebeaver.ai/logo_complete_color_inverted.png" width="330">
+  <source media="(prefers-color-scheme: light)" srcset="https://www.codebeaver.ai/logo_complete_color.png" width="330">
+  <img src="https://www.codebeaver.ai/logo_complete_color.png" alt="logo" width="330">
 
-Get Unit Tests with every push.
-
-[CodeBeaver](https://www.codebeaver.ai) is an AI agent that helps you ship faster by keeping your codebase stable.
+</picture>
+<h1 align="center">Unit Tests on Autopilot</h1>
+</div>
+<br/><br/>
 
 **CodeBeaver** supercharges your development workflow by:
 
