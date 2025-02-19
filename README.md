@@ -1,6 +1,6 @@
  <div align="center">
  <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://www.codebeaver.ai/logo_complete_color_inverted.png" width="330">
+  <source media="(prefers-color-scheme: dark)" srcset="https://www.codebeaver.ai/logo_complete_inverted.png" width="330">
   <source media="(prefers-color-scheme: light)" srcset="https://www.codebeaver.ai/logo_complete_color.png" width="330">
   <img src="https://www.codebeaver.ai/logo_complete_color.png" alt="logo" width="330">
 
