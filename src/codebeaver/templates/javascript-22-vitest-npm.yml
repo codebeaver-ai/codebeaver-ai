@@ -10,20 +10,14 @@ single_file_test_commands:
   - 'if [ -f "coverage/coverage-final.json" ]; then mv coverage/coverage-final.json coverage.json; else echo "Warn: coverage/coverage-final.json not found"; exit 1; fi'
 setup_commands:
   - npm install --legacy-peer-deps
-  - npm install -D typescript
-  - npm install -D @types/node
-  - npm install -D vitest@latest
+  - npm install -g npx
+  - npm install -D vitest@latest ts-node
   - npm install -D @vitest/coverage-v8@latest
-  - npm install -D @babel/core
-  - npm install -D @babel/preset-typescript
-  - npm install -D @babel/preset-react
-  - npm install -D @babel/preset-env
   - npm install -D @testing-library/react
   - npm install -D @testing-library/jest-dom
   - npm install -D @testing-library/user-event
-  - npm install -D jsdom
-  - "[ -f tsconfig.json ] || echo '{\"compilerOptions\":{\"target\":\"es5\",\"module\":\"commonjs\",\"strict\":true,\"esModuleInterop\":true,\"skipLibCheck\":true,\"forceConsistentCasingInFileNames\":true,\"jsx\":\"react-jsx\",\"types\":[\"jest\",\"node\"]}}' > tsconfig.json"
-  - "[ -f babel.config.js ] || echo 'module.exports={presets:[[\"@babel/preset-env\",{targets:{node:\"current\"}}],\"@babel/preset-typescript\",\"@babel/preset-react\"]}' > babel.config.js"
+  - npm install -D jest-environment-jsdom
+  - npm install -D @vitest/coverage-istanbul
 ignore:
   - "*prettierrc*"
   - "*eslintrc*"

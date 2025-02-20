@@ -1,0 +1,66 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "codebeaver"
+version = "0.1.0"
+description = "CodeBeaver - AI-powered code analysis and testing"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { file = "LICENSE" }
+authors = [
+    { name = "CodeBeaver Team", email = "info@codebeaver.ai" }
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+dependencies = [
+    "pytest>=7.0.0",
+    "pyyaml>=6.0.0",
+    "openai>=1.0.0",
+    "coverage>=7.0.0",
+    "pytest>=7.0.0",
+    "pytest-cov>=4.0.0",
+    "tree-sitter>=0.24.0",
+    "tree-sitter-typescript>=0.23.2",
+    "Pygments>=2.19.1",
+]
+
+[project.optional-dependencies]
+test = [
+    "black>=23.0.0",
+    "flake8>=6.0.0",
+]
+
+[project.urls]
+Homepage = "https://www.codebeaver.ai"
+Repository = "https://github.com/codebeaver-ai/codebeaver-ai"
+
+[project.scripts]
+codebeaver = "codebeaver.cli:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+norecursedirs = ["tests/codebases"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/codebeaver"]
+
+[tool.hatch.build.targets.sdist]
+include = ["src/codebeaver"]
+
+[tool.hatch.build.targets.wheel.sources]
+"src/codebeaver" = "codebeaver"
+"templates" = "codebeaver/templates"
+
+[tool.hatch.build.force-include]
+"templates" = "codebeaver/templates"
