@@ -41,9 +41,9 @@ Got a project in mind? Let's see CodeBeaver in action with your code:
 5. Watch CodeBeaver do its thing
 6. Check out the results!
 
-## Get started in minutes
+## Get started
 
-- [Create your account](https://www.codebeaver.ai/login)
+- [Create your account](https://app.codebeaver.ai/login)
 - [Read the docs](https://docs.codebeaver.ai/getting-started/quickstart)
 - [Configure with codebeaver.yml](https://docs.codebeaver.ai/configuration)
 
