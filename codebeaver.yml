@@ -1,0 +1,5 @@
+from: pytest
+ignore:
+  - "manage.py"
+  - "*urls.py"
+  - "*models.py"
