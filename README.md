@@ -129,7 +129,7 @@ Got a project in mind? Let's see CodeBeaver in action with your code:
 5. Watch CodeBeaver do its thing
 6. Check out the results!
 
-## Reference
+## CLI Reference
 
 ### Environment Variables
 
