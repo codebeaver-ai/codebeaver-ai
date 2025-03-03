@@ -16,7 +16,9 @@
 </a><br>
 
 🪵 CodeBeaver runs, writes and updates Unit Tests
+
 🖥️ CodeBeaver runs End-to-End Tests written in natural language.
+
 🌩️ Skip the setup - [try our hosted version](https://www.codebeaver.ai) to put Unit Tests & E2E Tests on autopilot!
 
 **CodeBeaver** supercharges your development workflow by:
