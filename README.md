@@ -15,11 +15,12 @@
 <img alt="GitHub" src="https://img.shields.io/github/last-commit/codebeaver-ai/codebeaver-ai/main?style=for-the-badge" height="20">
 </a><br>
 
-🪵 CodeBeaver runs, writes and updates unit tests.
+🪵 CodeBeaver runs, writes and updates Unit Tests
+🖥️ CodeBeaver runs End-to-End Tests written in natural language.
 
 🐛 If a test fails due to a bug, CodeBeaver will spot it and explain how to fix it.
 
-🌩️ Skip the setup - [try our hosted version](https://www.codebeaver.ai) to get Unit Tests after every Pull Request!
+🌩️ Skip the setup - [try our hosted version](https://www.codebeaver.ai) to get Unit Tests & E2E Tests after every Pull Request!
 
 **CodeBeaver** supercharges your development workflow by:
 
@@ -28,14 +29,55 @@
 - Adding edge cases you might have missed
 - Pinpointing exactly where bugs are hiding in your code
 
-## Quick start
+# E2E Test Quickstart
+
+Install the package
+
+```bash
+pip install codebeaver
+```
+
+If you dont have chrome, install it from [here](https://www.google.com/chrome/)
+
+Write a yaml file with the tests, for example `test.yaml`:
+
+```yaml
+e2e:
+  login-test: # Name of the test. You can add more
+    url: "localhost:3000" # Starting URL of your app
+    steps:
+      - Login with Github
+      - Go to the team page
+      - Change the team name to "e2e"
+      - Click on the "Save" button
+      - Check that the team name is "e2e"
+```
+
+Run the E2Etest
+
+```bash
+export OPENAI_API_KEY="your-openai-api-key"
+codebeaver e2e test.yaml
+```
+
+You will get a report like the following:
+
+````
+🖥️ 1/1 E2E test passed
+
+login-test: Success!
+
+```
+
+
+## Unit Test Quick start
 
 Quickstart:
 
 ```bash
 pip install codebeaver
-codebeaver run pytest
-```
+codebeaver unit pytest
+````
 
 This will run CodeBeaver with the pytest framework. You will get a report like the following:
 
@@ -62,6 +104,8 @@ Potential issues found in the following files:
 expense_tracker.py
 The error occurs because the code in total_expense_by_category only converts the input parameter (category) to lower-case and compares it with the expense entries exactly. However, the expenses added in the test have "category" values in different cases (e.g., "FOOD", "Food") that are not converted to lower-case, so they don't match "food" (the lowercased input). This makes the method only sum the expense that exactly matches "food" in lower-case, resulting in an incorrect sum.
 ```
+
+You can check the available frameworks in the [templates folder of this repo](https://github.com/codebeaver-ai/codebeaver-ai/tree/main/codebeaver-internal/templates).
 
 ## See it in action
 

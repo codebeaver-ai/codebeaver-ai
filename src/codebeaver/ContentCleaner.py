@@ -856,7 +856,7 @@ class ContentCleaner:
             merged = {}
             for scenario_name, data in scenarios.items():
                 merged[f"test_scenario_{scenario_name}"] = (
-                    f"{"describe(" if data["type"] =="describe" else "test("}'{scenario_name}', () => {{\n{data["docstring"] if data["docstring"] else ""}    {data["body"]}\n}});"
+                    f"{('describe(' if data['type'] == 'describe' else 'test(')}'{scenario_name}', () => {{\n{data['docstring'] if data['docstring'] else ''} {data['body']}\n}});"
                 )
             return merged
 

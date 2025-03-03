@@ -4,7 +4,7 @@ import os
 import pytest
 import tempfile
 import pathlib
-from codebeaver import cli, __version__
+from src.codebeaver import cli, __version__
 import subprocess
 
 
