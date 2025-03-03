@@ -25,7 +25,7 @@
 
 ## Quickstart
 
-### E2E Test Quickstart
+### E2E Tests Quickstart
 
 Install the package
 
@@ -65,7 +65,7 @@ login-test: Success!
 
 ```
 
-### Unit Test Quick start
+### Unit Tests Quickstart
 
 Quickstart:
 
