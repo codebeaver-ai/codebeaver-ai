@@ -85,6 +85,7 @@ This will run CodeBeaver with the pytest framework. You will get a report like t
 
 <details>
 <summary>Example Test Report</summary>
+
 ```
 🔄 1 test added and 1 test updated to reflect recent changes.
 🐛 Found 1 bug
@@ -109,7 +110,9 @@ expense_tracker.py
 The error occurs because the code in total_expense_by_category only converts the input parameter (category) to lower-case and compares it with the expense entries exactly. However, the expenses added in the test have "category" values in different cases (e.g., "FOOD", "Food") that are not converted to lower-case, so they don't match "food" (the lowercased input). This makes the method only sum the expense that exactly matches "food" in lower-case, resulting in an incorrect sum.
 
 ```
+
 </details>
+
 `pyest` references a CodeBeaver template. You can check the available frameworks in the [templates folder of this repo](https://github.com/codebeaver-ai/codebeaver-ai/tree/main/templates)
 
 ## Examples
@@ -162,4 +165,7 @@ You can configure CodeBeaver with a `codebeaver.yml` file. [Full documentation h
 - [Configure with codebeaver.yml](https://docs.codebeaver.ai/configuration)
 - E2E is powered by [BrowserUse](https://github.com/browser-use/browser-use)
 - LLM is powered by [OpenAI](https://openai.com)
+
+```
+
 ```
