@@ -47,6 +47,8 @@ class E2E:
     ):
         self.tests = tests
         self.chrome_instance_path = chrome_instance_path
+        if os.getenv("CHROME_INSTANCE_PATH"):
+            self.chrome_instance_path = os.getenv("CHROME_INSTANCE_PATH")
 
     async def run(self):
         all_tests: list[End2endTest] = []

@@ -19,7 +19,9 @@
 
 🖥️ CodeBeaver runs End-to-End Tests written in natural language.
 
-🌩️ Skip the setup - [try our hosted version](https://www.codebeaver.ai) to put Unit Tests & E2E Tests on autopilot!
+🌩️ Skip the setup - [try our hosted version](https://www.codebeaver.ai) to put tests on autopilot!
+
+---
 
 **CodeBeaver** supercharges your development workflow by:
 
@@ -28,7 +30,9 @@
 - Adding edge cases you might have missed
 - If a test fails due to a bug, 🐛 CodeBeaver will spot it and explain how to fix it.
 
-# E2E Test Quickstart
+## Quickstart
+
+### E2E Test Quickstart
 
 Install the package
 
@@ -68,7 +72,7 @@ login-test: Success!
 
 ```
 
-## Unit Test Quick start
+### Unit Test Quick start
 
 Quickstart:
 
@@ -110,8 +114,6 @@ You can check the available frameworks in the [templates folder of this repo](ht
 - [CodeBeaver discovers a bug and explains where the problem is](https://github.com/codebeaver-ai/codebeaver-ai/pull/8)
 - [CodeBeaver updates a test given the new code commited](https://github.com/codebeaver-ai/codebeaver-ai/pull/12)
 
-## Try it yourself
-
 Got a project in mind? Let's see CodeBeaver in action with your code:
 
 1. Fork this repo (main branch is fine)
@@ -121,9 +123,29 @@ Got a project in mind? Let's see CodeBeaver in action with your code:
 5. Watch CodeBeaver do its thing
 6. Check out the results!
 
-## Supported Languages and Frameworks
+## Reference
 
-CodeBeaver currently supports Python and TypeScript. CodeBeaver Cloud also supports JavaScript, Go, Ruby.
+### Environment Variables
+
+- `OPENAI_API_KEY`: Your OpenAI API key.
+- `CHROME_INSTANCE_PATH`: Path to your Chrome instance. Defaults to `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`
+
+### Supported Languages and Frameworks
+
+CodeBeaver currently supports:
+
+- Python
+- TypeScript
+
+[CodeBeaver Cloud](https://www.codebeaver.ai) also supports:
+
+- JavaScript
+- Go
+- Ruby
+
+### Advanced configuration
+
+You can configure CodeBeaver with a `codebeaver.yml` file. [Full documentation here](https://docs.codebeaver.ai/configuration)
 
 ## Let's chat!
 
@@ -131,12 +153,9 @@ CodeBeaver currently supports Python and TypeScript. CodeBeaver Cloud also suppo
 - Join the community on [Discord](https://discord.gg/4QMwWdsMGt)
 - Questions? Hit us up at [info@codebeaver.ai](mailto:info@codebeaver.ai)
 
-# Powered by
-
-- [BrowserUse](https://github.com/browser-use/browser-use) for E2E
-- [OpenAI](https://openai.com) for LLM
-
 ## Resources
 
 - [CodeBeaver Cloud docs](https://docs.codebeaver.ai/getting-started/quickstart)
 - [Configure with codebeaver.yml](https://docs.codebeaver.ai/configuration)
+- E2E is powered by [BrowserUse](https://github.com/browser-use/browser-use)
+- LLM is powered by [OpenAI](https://openai.com)
