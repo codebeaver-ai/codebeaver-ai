@@ -57,29 +57,23 @@ def valid_file_path(path):
 
 def main(args=None):
     """Main entry point for the CLI."""
-
     if args is None:
         args = sys.argv[1:]
 
-    # Handle --version and --help before any other checks
-    if args and args[0] in ["--version", "--help", "-h"]:
-        parser = argparse.ArgumentParser(
-            description="CodeBeaver - AI-powered code analysis and testing"
-        )
-        parser.add_argument(
-            "--version", action="version", version=f"CodeBeaver {__version__}"
-        )
-        parser.parse_args(args)
-        return
-
-    # Check for empty args before environment check
-    if not args:
-        print("Error: Please specify a command (unit or e2e)")
-        sys.exit(1)
-
-    # Create the main parser
+    # Create the main parser with more detailed description
     parser = argparse.ArgumentParser(
-        description="CodeBeaver - AI-powered code analysis and testing"
+        description="""CodeBeaver - AI-powered code analysis and testing
+
+CodeBeaver helps you generate and run tests for your code using AI. It supports:
+- Unit test generation and execution
+- End-to-end test automation
+- Multiple testing frameworks (pytest, jest, vitest)
+
+Examples:
+  codebeaver unit pytest my_file.py    # Generate unit tests using pytest
+  codebeaver e2e config.yml           # Run end-to-end tests from config
+""",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
     )
     parser.add_argument(
         "--version", action="version", version=f"CodeBeaver {__version__}"
@@ -88,13 +82,28 @@ def main(args=None):
     # Create subparsers for different commands
     subparsers = parser.add_subparsers(dest="command", help="Command to execute")
 
-    # Unit test command (previously 'run')
+    # Unit test command with enhanced help
     available_templates = get_available_templates()
-    unit_parser = subparsers.add_parser("unit", help="Generate unit tests for a file")
+    unit_parser = subparsers.add_parser(
+        "unit",
+        help="Generate and run unit tests for a file",
+        description="""Generate and run unit tests for a specified file using AI.
+        
+The command will:
+1. Analyze the target file
+2. Generate appropriate test cases
+3. Run the tests to verify they work
+4. Save the tests to a new test file
+
+Examples:
+  codebeaver unit pytest src/my_file.py
+  codebeaver unit jest src/component.js
+""",
+    )
     unit_parser.add_argument(
         "template",
         choices=available_templates,
-        help="Template to use (e.g., pytest, jest, vitest)",
+        help="Testing framework template to use (e.g., pytest, jest, vitest)",
     )
     unit_parser.add_argument(
         "file_path",
@@ -102,12 +111,28 @@ def main(args=None):
         help="Path to the file to analyze",
     )
 
-    # E2E test command (mocked for now)
-    e2e_parser = subparsers.add_parser("e2e", help="Generate end-to-end tests")
+    # E2E test command with enhanced help
+    e2e_parser = subparsers.add_parser(
+        "e2e",
+        help="Generate and run end-to-end tests",
+        description="""Generate and run end-to-end tests based on a YAML configuration file.
+        
+The command will:
+1. Read the E2E test configuration from the YAML file
+2. Set up the test environment
+3. Execute the end-to-end tests
+4. Report the results
+
+Examples:
+  codebeaver e2e tests/e2e-config.yml
+""",
+    )
     e2e_parser.add_argument(
         "yaml_file",
         type=valid_file_path,
-        help="Path to the YAML configuration file",
+        nargs="?",
+        default="codebeaver.yml",
+        help="Path to the YAML configuration file (defaults to codebeaver.yml)",
     )
 
     args = parser.parse_args(args)
@@ -134,9 +159,9 @@ def run_unit_command(args):
     # parse the yaml of the template
     template_path = get_template_dir() / f"{args.template}.yml"
     parsed_file = yaml.safe_load(template_path.open())
-    print(parsed_file)
 
     single_file_test_commands = parsed_file["single_file_test_commands"]
+    setup_commands = parsed_file["setup_commands"]
     if len(single_file_test_commands) == 0:
         print("Error: No test commands found in the template")
         sys.exit(1)
@@ -144,26 +169,25 @@ def run_unit_command(args):
     if not file_content or file_content == "":
         print("Error: File is empty")
         sys.exit(1)
-    testrunner = TestRunner(single_file_test_commands)
-    test_result = testrunner.run_test(args.file_path)
-    if (
-        test_result.returncode != 0
-        and test_result.returncode != 1
-        and test_result.returncode != 5
-    ):
-        print("Error: Could not run tests")
+    testrunner = TestRunner(single_file_test_commands, setup_commands)
+    test_result = testrunner.setup()
+    if test_result.returncode != 0:
+        print("Error: Could not run setup commands")
         sys.exit(1)
+    test_files_pattern = TestFilePattern(pathlib.Path.cwd())
+    test_file = test_files_pattern.find_test_file(args.file_path)
+    if test_file:
+        test_result = testrunner.run_test(args.file_path, test_file)
+        if (
+            test_result.returncode != 0
+            and test_result.returncode != 1
+            and test_result.returncode != 5
+        ):
+            print("Error: Could not run tests")
+            sys.exit(1)
 
-    test_file = None
-    try:
-        test_file_pattern = TestFilePattern(pathlib.Path.cwd())
-        test_file = test_file_pattern.find_test_file(args.file_path)
-        if not test_file:
-            test_file = test_file_pattern.create_new_test_file(args.file_path)
-    except Exception as e:
-        print(f"No test file found for {args.file_path}")
-        print(test_file)
-        sys.exit(1)
+    else:
+        test_file = test_files_pattern.create_new_test_file(args.file_path)
 
     max_tentatives = 4
     tentatives = 0
@@ -177,7 +201,7 @@ def run_unit_command(args):
         with open(test_file, "w") as f:
             f.write(test_content)
 
-        test_results = testrunner.run_test(args.file_path)
+        test_results = testrunner.run_test(args.file_path, test_file)
         if test_results.returncode == 0:
             break
         if test_results.stdout:
@@ -185,8 +209,10 @@ def run_unit_command(args):
         if test_results.stderr:
             console += test_results.stderr
         tentatives += 1
+        print(f"Tentative {tentatives} of {max_tentatives}")
+        print("errors:", test_results.stderr)
 
-    print("TEST CONTENT:", test_content)
+    # print("TEST CONTENT:", test_content)
     print("TEST FILE written to:", test_file)
     if tentatives >= max_tentatives:
         print("Error: Could not generate valid tests")

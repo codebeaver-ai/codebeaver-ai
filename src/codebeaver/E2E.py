@@ -15,21 +15,16 @@ from pydantic import BaseModel
 load_dotenv()
 
 
-class End2endTest:
-    steps: "list[str]"
+class End2endTest(BaseModel):
+    steps: list[str]
     url: str
-    passed: bool
-    errored: bool
-    comment: str
+    passed: bool = False
+    errored: bool = False
+    comment: str = ""
     name: str
 
-    def __init__(self, name: str, steps: "list[str]", url: str):
-        self.name = name
-        self.steps = steps
-        self.url = url
-        self.passed = False
-        self.errored = False
-        self.comment = ""
+    def __init__(self, name: str, steps: list[str], url: str):
+        super().__init__(name=name, steps=steps, url=url)
 
 
 class TestCase(BaseModel):
@@ -66,7 +61,7 @@ class E2E:
             all_tests.append(test_result)
         # write the results to e2e.json
         with open("e2e.json", "w") as f:
-            json.dump(all_tests, f)
+            json.dump([test.model_dump() for test in all_tests], f)
         total_passed = sum(1 for test in all_tests if test.passed)
         print(f"🖥️ {total_passed}/{len(all_tests)} E2E tests passed")
         print("-" * 80)

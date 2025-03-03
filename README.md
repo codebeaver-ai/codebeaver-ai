@@ -17,17 +17,14 @@
 
 🪵 CodeBeaver runs, writes and updates Unit Tests
 🖥️ CodeBeaver runs End-to-End Tests written in natural language.
-
-🐛 If a test fails due to a bug, CodeBeaver will spot it and explain how to fix it.
-
-🌩️ Skip the setup - [try our hosted version](https://www.codebeaver.ai) to get Unit Tests & E2E Tests after every Pull Request!
+🌩️ Skip the setup - [try our hosted version](https://www.codebeaver.ai) to put Unit Tests & E2E Tests on autopilot!
 
 **CodeBeaver** supercharges your development workflow by:
 
 - Writing new tests when you need them
 - Keeping your test suite up-to-date as your code evolves
 - Adding edge cases you might have missed
-- Pinpointing exactly where bugs are hiding in your code
+- If a test fails due to a bug, 🐛 CodeBeaver will spot it and explain how to fix it.
 
 # E2E Test Quickstart
 
@@ -37,7 +34,7 @@ Install the package
 pip install codebeaver
 ```
 
-If you dont have chrome, install it from [here](https://www.google.com/chrome/)
+If you dont have chrome, install it from [here](https://www.google.com/chrome/).
 
 Write a yaml file with the tests, for example `test.yaml`:
 
@@ -62,13 +59,12 @@ codebeaver e2e test.yaml
 
 You will get a report like the following:
 
-````
+```bash
 🖥️ 1/1 E2E test passed
 
 login-test: Success!
 
 ```
-
 
 ## Unit Test Quick start
 
@@ -76,8 +72,8 @@ Quickstart:
 
 ```bash
 pip install codebeaver
-codebeaver unit pytest
-````
+codebeaver unit pytest the_file_you_want_to_test.py
+```
 
 This will run CodeBeaver with the pytest framework. You will get a report like the following:
 
@@ -105,11 +101,9 @@ expense_tracker.py
 The error occurs because the code in total_expense_by_category only converts the input parameter (category) to lower-case and compares it with the expense entries exactly. However, the expenses added in the test have "category" values in different cases (e.g., "FOOD", "Food") that are not converted to lower-case, so they don't match "food" (the lowercased input). This makes the method only sum the expense that exactly matches "food" in lower-case, resulting in an incorrect sum.
 ```
 
-You can check the available frameworks in the [templates folder of this repo](https://github.com/codebeaver-ai/codebeaver-ai/tree/main/codebeaver-internal/templates).
+You can check the available frameworks in the [templates folder of this repo](https://github.com/codebeaver-ai/codebeaver-ai/tree/main/templates)
 
-## See it in action
-
-Want to see the magic? Check out these real examples from our Pull Requests:
+## Examples
 
 - [CodeBeaver discovers a bug and explains where the problem is](https://github.com/codebeaver-ai/codebeaver-ai/pull/8)
 - [CodeBeaver updates a test given the new code commited](https://github.com/codebeaver-ai/codebeaver-ai/pull/12)
@@ -125,13 +119,22 @@ Got a project in mind? Let's see CodeBeaver in action with your code:
 5. Watch CodeBeaver do its thing
 6. Check out the results!
 
-## Resources
+## Supported Languages and Frameworks
 
-- [Read the docs](https://docs.codebeaver.ai/getting-started/quickstart)
-- [Configure with codebeaver.yml](https://docs.codebeaver.ai/configuration)
+CodeBeaver currently supports Python and TypeScript. CodeBeaver Cloud also supports JavaScript, Go, Ruby.
 
 ## Let's chat!
 
 - Found a bug? Open an issue!
 - Join the community on [Discord](https://discord.gg/4QMwWdsMGt)
 - Questions? Hit us up at [info@codebeaver.ai](mailto:info@codebeaver.ai)
+
+# Powered by
+
+- [BrowserUse](https://github.com/browser-use/browser-use) for E2E
+- [OpenAI](https://openai.com) for LLM
+
+## Resources
+
+- [CodeBeaver Cloud docs](https://docs.codebeaver.ai/getting-started/quickstart)
+- [Configure with codebeaver.yml](https://docs.codebeaver.ai/configuration)

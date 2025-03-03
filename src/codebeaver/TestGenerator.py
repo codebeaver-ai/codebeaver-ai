@@ -60,17 +60,19 @@ Last console output:
 
     Add a docstring to the test to explain what the test is doing.
     """
-        print("PROMPT:", prompt)
+        # print("PROMPT:", prompt)
         response = openai.chat.completions.create(
             model="o3-mini",
             messages=[{"role": "user", "content": prompt}],
             max_completion_tokens=100000,
         )
-        print("RESPONSE:", response.choices[0].message.content)
+        # print("RESPONSE:", response.choices[0].message.content)
 
         test_content = ResponseParser.parse(response.choices[0].message.content)
 
-        test_content = ContentCleaner.merge_files(test_content, test_file_content)
+        test_content = ContentCleaner.merge_files(
+            self.file_path, test_content, test_file_content
+        )
         if not test_content:
             raise ValueError("Error: No test content found")
         return test_content

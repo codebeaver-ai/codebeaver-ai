@@ -5,7 +5,8 @@ from typing import Literal
 import black
 import tree_sitter_typescript as tstypescript
 from tree_sitter import Language, Node, Parser, Tree
-from pygments.lexers import guess_lexer
+from pygments.lexers import guess_lexer, get_lexer_by_name
+from pygments.lexers import ClassNotFound
 
 import logging
 
@@ -14,30 +15,58 @@ logger = logging.getLogger(__name__)
 
 class ContentCleaner:
 
+    # Default supported languages, can be overridden by users
+    SUPPORTED_LANGUAGES = {
+        "python": {
+            "aliases": ["python", "python3", "py"],
+            "merge_function": "merge_python_files",
+        },
+        "typescript": {
+            "aliases": ["typescript", "ts", "tsx", "javascript", "js", "jsx"],
+            "merge_function": "merge_typescript_files",
+        },
+    }
+
+    @classmethod
+    def get_supported_languages(cls) -> dict:
+        """Get the current supported languages configuration"""
+        return cls.SUPPORTED_LANGUAGES
+
+    @classmethod
+    def set_supported_languages(cls, languages: dict) -> None:
+        """Update the supported languages configuration"""
+        cls.SUPPORTED_LANGUAGES = languages
+
     @staticmethod
-    def merge_files(file1_content: str, file2_content: str | None) -> str | None:
+    def merge_files(
+        file1_path: str, file1_content: str, file2_content: str | None
+    ) -> str | None:
         """
         Merge two files into one. First it detects the language of the files with guesslang,
         then uses the appropriate merge function.
         """
-        lexer = guess_lexer(file1_content)
-        file1_language = lexer.name
-        if file2_content == "" or file2_content is None: # support empty files
-            file2_content = ""
-            file2_language = file1_language
-        else:
-            lexer = guess_lexer(file2_content)
-            file2_language = lexer.name
-        if file1_language == file2_language:
-            match file1_language.lower():
-                case "python":
-                    return ContentCleaner.merge_python_files(file1_content, file2_content)
-                case "typescript":
-                    return ContentCleaner.merge_typescript_files(file1_content, file2_content)
-                case _:
-                    raise ValueError(f"Unsupported language: {file1_language}")
-        else:
-            raise ValueError(f"Languages of the two files do not match: {file1_language} != {file2_language}")
+
+        def get_language() -> str | None:
+            if file1_path.endswith(".py"):
+                return "python"
+            elif file1_path.endswith(".ts") or file1_path.endswith(".tsx"):
+                return "typescript"
+            elif file1_path.endswith(".js") or file1_path.endswith(".jsx"):
+                return "javascript"
+            return None
+
+        file1_language = get_language()
+        if file1_language is None:
+            raise ValueError(
+                f"Unsupported language for file1: {guess_lexer(file1_content).name}"
+            )
+
+        # Dynamically get the merge function based on the language
+        merge_function_name = ContentCleaner.SUPPORTED_LANGUAGES[file1_language][
+            "merge_function"
+        ]
+        merge_function = getattr(ContentCleaner, merge_function_name)
+        return merge_function(file1_content, file2_content)
 
     @staticmethod
     def clean_python(content: str) -> str:

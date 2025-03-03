@@ -21,7 +21,7 @@ setup_commands:
   - if [ -f "setup.cfg" ]; then pip install -q -e .[test] || true; fi
   - if [ -f "pyproject.toml" ]; then pip install -e .[dev] || pip install -e .[test] || pip install -e . || true; fi
   - python -c "import coverage" 2>/dev/null || pip install -q "coverage" || true
-  - if [ ! -f ".coveragerc" ]; then echo -e "[run]\nrelative_files = True\nsource = .\ninclude =\n    *.py\nomit =\n    */test_*.py\n    */*_test.py\n    */tests/*\n    */testing/*\n    */test/*\n    tests/**\n    **/tests/**\n    .tox/*\n    /usr/*\n[report]\nshow_missing = True" > .coveragerc; fi
+  - if [ ! -f ".coveragerc" ]; then echo "[run]\nrelative_files = True\nsource = .\ninclude =\n    *.py\nomit =\n    */test_*.py\n    */*_test.py\n    */tests/*\n    */testing/*\n    */test/*\n    tests/**\n    **/tests/**\n    .tox/*\n    /usr/*\n[report]\nshow_missing = True" > .coveragerc; fi
   - python -c "import pytest" 2>/dev/null || pip install -q "pytest" || true
   - python -c "import pytest" 2>/dev/null || pip install -q "pytest" || true
   - python -c "import pytest_cov" 2>/dev/null || pip install -q "pytest-cov" || true
