@@ -42,12 +42,12 @@ pip install codebeaver
 
 If you dont have chrome, install it from [here](https://www.google.com/chrome/).
 
-Write a yaml file with the tests, for example `test.yaml`:
+Write a yaml file with the tests called `codebeaver.yaml`:
 
 ```yaml
 e2e:
   login-test: # Name of the test. You can add more
-    url: "localhost:3000" # Starting URL of your app
+    url: "localhost:3000" # Starting URL of your app. It can be a local server or a remote server
     steps:
       - Login with Github
       - Go to the team page
@@ -60,7 +60,7 @@ Run the E2Etest
 
 ```bash
 export OPENAI_API_KEY="your-openai-api-key"
-codebeaver e2e test.yaml
+codebeaver e2e
 ```
 
 You will get a report like the following:
@@ -83,6 +83,8 @@ codebeaver unit pytest the_file_you_want_to_test.py
 
 This will run CodeBeaver with the pytest framework. You will get a report like the following:
 
+<details>
+<summary>Example Test Report</summary>
 ```
 🔄 1 test added and 1 test updated to reflect recent changes.
 🐛 Found 1 bug
@@ -105,9 +107,10 @@ Potential issues found in the following files:
 
 expense_tracker.py
 The error occurs because the code in total_expense_by_category only converts the input parameter (category) to lower-case and compares it with the expense entries exactly. However, the expenses added in the test have "category" values in different cases (e.g., "FOOD", "Food") that are not converted to lower-case, so they don't match "food" (the lowercased input). This makes the method only sum the expense that exactly matches "food" in lower-case, resulting in an incorrect sum.
-```
 
-You can check the available frameworks in the [templates folder of this repo](https://github.com/codebeaver-ai/codebeaver-ai/tree/main/templates)
+```
+</details>
+`pyest` references a CodeBeaver template. You can check the available frameworks in the [templates folder of this repo](https://github.com/codebeaver-ai/codebeaver-ai/tree/main/templates)
 
 ## Examples
 
@@ -159,3 +162,4 @@ You can configure CodeBeaver with a `codebeaver.yml` file. [Full documentation h
 - [Configure with codebeaver.yml](https://docs.codebeaver.ai/configuration)
 - E2E is powered by [BrowserUse](https://github.com/browser-use/browser-use)
 - LLM is powered by [OpenAI](https://openai.com)
+```
