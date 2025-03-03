@@ -6,7 +6,7 @@ test_commands:
   - "npx jest --coverage --coverageReporters=json --json --outputFile=jest-results.json --collectCoverageFrom='**/*.{js,jsx,ts,tsx}' --coveragePathIgnorePatterns='node_modules' --passWithNoTests || [ $? -eq 1 -o $? -eq 5 ]"
   - "if [ -f 'coverage/coverage-final.json' ]; then mv coverage/coverage-final.json coverage.json; else echo 'Warn: coverage/coverage-final.json not found'; exit 1; fi"
 single_file_test_commands:
-  - "npx jest --coverage --coverageReporters=json --json --outputFile=jest-results.json --testPathPattern=$TEST_FILE --collectCoverageFrom=$TO_BE_COVERED_FILE --passWithNoTests || [ $? -eq 1 -o $? -eq 5 ]"
+  - "npx jest --coverage --coverageReporters=json --json --outputFile=jest-results.json --testPathPattern=$TEST_FILE --collectCoverageFrom=$FILE_TO_COVER --passWithNoTests || [ $? -eq 1 -o $? -eq 5 ]"
   - "if [ -f 'coverage/coverage-final.json' ]; then mv coverage/coverage-final.json coverage.json; else echo 'Warn: coverage/coverage-final.json not found'; exit 1; fi"
 setup_commands:
   - npm install -g pnpm
@@ -26,8 +26,8 @@ setup_commands:
   - pnpm add -D @testing-library/jest-dom
   - pnpm add -D @testing-library/user-event
   - pnpm add -D jest-environment-jsdom
-  - "[ -f tsconfig.json ] || echo '{\"compilerOptions\":{\"target\":\"es5\",\"module\":\"commonjs\",\"strict\":true,\"esModuleInterop\":true,\"skipLibCheck\":true,\"forceConsistentCasingInFileNames\":true,\"jsx\":\"react-jsx\",\"types\":[\"jest\",\"node\"]}}' > tsconfig.json"
-  - "[ -f babel.config.js ] || echo 'module.exports={presets:[[\"@babel/preset-env\",{targets:{node:\"current\"}}],\"@babel/preset-typescript\",\"@babel/preset-react\"]}' > babel.config.js"
+  - '[ -f tsconfig.json ] || echo ''{"compilerOptions":{"target":"es5","module":"commonjs","strict":true,"esModuleInterop":true,"skipLibCheck":true,"forceConsistentCasingInFileNames":true,"jsx":"react-jsx","types":["jest","node"]}}'' > tsconfig.json'
+  - '[ -f babel.config.js ] || echo ''module.exports={presets:[["@babel/preset-env",{targets:{node:"current"}}],"@babel/preset-typescript","@babel/preset-react"]}'' > babel.config.js'
 ignore:
   - "*prettierrc*"
   - "*eslintrc*"

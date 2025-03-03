@@ -19,7 +19,7 @@ class TestRunner:
         self, source_file_path: str, test_file_path: str
     ) -> subprocess.CompletedProcess:
         commands = self.single_file_test_commands.copy()
-        commands.insert(0, f"export TO_BE_COVERED_FILE='{source_file_path}'")
+        commands.insert(0, f"export FILE_TO_COVER='{source_file_path}'")
         commands.insert(0, f"export TEST_FILE='{test_file_path}'")
         command = " && ".join(commands)
         test_result = subprocess.run(command, shell=True, cwd=pathlib.Path.cwd())
