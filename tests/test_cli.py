@@ -52,28 +52,34 @@ def test_missing_api_key(capsys, monkeypatch):
     # assert "Error: OPENAI_API_KEY environment variable is not set" in captured.out
 
 
-def test_invalid_template(capsys, mock_env, temp_file):
+def test_invalid_template(capsys, mock_env, temp_file, monkeypatch):
     """Test that invalid template raises an error."""
+    """Test that an invalid template produces an argparse error."""
+    monkeypatch.setattr(cli, "get_available_templates", lambda: ["pytest"])
     with pytest.raises(SystemExit) as exc_info:
-        cli.main(["run", "invalid_template", temp_file])
+        cli.main(["unit", "invalid_template", temp_file])
     assert exc_info.value.code == 2  # argparse exits with code 2 for invalid choice
     captured = capsys.readouterr()
     assert "invalid choice: 'invalid_template'" in captured.err
 
 
-def test_nonexistent_file(capsys, mock_env):
+def test_nonexistent_file(capsys, mock_env, monkeypatch):
     """Test that nonexistent file raises an error."""
+    """Test that a nonexistent file raises an error."""
+    monkeypatch.setattr(cli, "get_available_templates", lambda: ["pytest"])
     with pytest.raises(SystemExit) as exc_info:
-        cli.main(["run", "pytest", "nonexistent_file.py"])
+        cli.main(["unit", "pytest", "nonexistent_file.py"])
     assert exc_info.value.code == 2  # argparse exits with code 2 for invalid argument
     captured = capsys.readouterr()
     assert "File not found: nonexistent_file.py" in captured.err
 
 
-def test_run_command_missing_args(capsys, mock_env):
+def test_run_command_missing_args(capsys, mock_env, monkeypatch):
     """Test the run command with missing arguments."""
+    """Test the unit command with missing arguments."""
+    monkeypatch.setattr(cli, "get_available_templates", lambda: ["pytest"])
     with pytest.raises(SystemExit) as exc_info:
-        cli.main(["run"])
+        cli.main(["unit"])
     assert exc_info.value.code == 2  # argparse exits with code 2 for missing arguments
     captured = capsys.readouterr()
     assert "the following arguments are required: template, file_path" in captured.err
@@ -88,10 +94,18 @@ def test_run_command_no_args(capsys):
     # assert "Error: Please specify what to run" in captured.out
 
 
-def test_run_command_with_correct_args_but_invalid_setup(capsys, mock_env, temp_file):
+def test_run_command_with_correct_args_but_invalid_setup(capsys, mock_env, temp_file, monkeypatch):
     """Test the run command with correct arguments."""
+    """Test the unit command with valid arguments but with a template that causes setup failure."""
+    monkeypatch.setattr(cli, "get_available_templates", lambda: ["pytest"])
+    import tempfile
+    dummy_dir = tempfile.mkdtemp()
+    dummy_template_path = pathlib.Path(dummy_dir) / "pytest.yml"
+    with open(dummy_template_path, "w") as f:
+        f.write("single_file_test_commands: []\nsetup_commands: []\n")
+    monkeypatch.setattr(cli, "get_template_dir", lambda: pathlib.Path(dummy_dir))
     with pytest.raises(SystemExit) as exc_info:
-        cli.main(["run", "pytest", temp_file])
+        cli.main(["unit", "pytest", temp_file])
     # captured = capsys.readouterr()
     assert exc_info.value.code == 1
 
