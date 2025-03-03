@@ -19,7 +19,7 @@
 
 🖥️ CodeBeaver runs End-to-End Tests written in natural language.
 
-🐛 CodeBeaver will spot bugs and explain how to fix them.
+🐛 CodeBeaver spots bugs and explains how to fix them.
 
 🌩️ Skip the setup - [try our hosted version](https://www.codebeaver.ai)
 
