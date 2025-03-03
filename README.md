@@ -5,7 +5,7 @@
   <img src="https://www.codebeaver.ai/logo_complete_color.png" alt="logo" width="330">
 
 </picture>
-<h1 align="center">Unit Tests on Autopilot</h1>
+<h1 align="center">Tests on Autopilot</h1>
 </div>
 <br/><br/>
 
@@ -153,12 +153,6 @@ CodeBeaver currently supports:
 
 You can configure CodeBeaver with a `codebeaver.yml` file. [Full documentation here](https://docs.codebeaver.ai/configuration)
 
-## Let's chat!
-
-- Found a bug? Open an issue!
-- Join the community on [Discord](https://discord.gg/4QMwWdsMGt)
-- Questions? Hit us up at [info@codebeaver.ai](mailto:info@codebeaver.ai)
-
 ## Resources
 
 - [CodeBeaver Cloud docs](https://docs.codebeaver.ai/getting-started/quickstart)
@@ -166,6 +160,17 @@ You can configure CodeBeaver with a `codebeaver.yml` file. [Full documentation h
 - E2E is powered by [BrowserUse](https://github.com/browser-use/browser-use)
 - LLM is powered by [OpenAI](https://openai.com)
 
-```
+## Roadmap
 
-```
+- [✅] Unit tests
+- [✅] E2E Tests
+- [ ] Unit Tests: Add support for more languages and frameworks
+- [ ] Unit Tests: Add support for more testing frameworks
+- [ ] Integration Tests
+- [ ] Add support for more models
+
+## Let's chat!
+
+- Found a bug? Open an issue!
+- Join the community on [Discord](https://discord.gg/4QMwWdsMGt)
+- Questions? Hit us up at [info@codebeaver.ai](mailto:info@codebeaver.ai)
