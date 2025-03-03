@@ -1,6 +1,6 @@
  <div align="center">
  <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="https://www.codebeaver.ai/logo_complete_inverted.png"  width="330">
+  <source media="(prefers-color-scheme: dark)" srcset="https://www.codebeaver.ai/logo_complete_inverted.png" width="330">
   <source media="(prefers-color-scheme: light)" srcset="https://www.codebeaver.ai/logo_complete_color.png" width="330">
   <img src="https://www.codebeaver.ai/logo_complete_color.png" alt="logo" width="330">
 
@@ -19,16 +19,9 @@
 
 🖥️ CodeBeaver runs End-to-End Tests written in natural language.
 
-🌩️ Skip the setup - [try our hosted version](https://www.codebeaver.ai) to put tests on autopilot!
+🐛 CodeBeaver will spot bugs and explain how to fix them.
 
----
-
-**CodeBeaver** supercharges your development workflow by:
-
-- Writing new tests when you need them
-- Keeping your test suite up-to-date as your code evolves
-- Adding edge cases you might have missed
-- If a test fails due to a bug, 🐛 CodeBeaver will spot it and explain how to fix it.
+🌩️ Skip the setup - [try our hosted version](https://www.codebeaver.ai)
 
 ## Quickstart
 
@@ -40,9 +33,9 @@ Install the package
 pip install codebeaver
 ```
 
-If you dont have chrome, install it from [here](https://www.google.com/chrome/).
+If you don't have chrome, install it from [here](https://www.google.com/chrome/).
 
-Write a yaml file with the tests called `codebeaver.yaml`:
+Add a yaml file to your project called `codebeaver.yaml`. You can list there your End 2 End tests in natural language like so:
 
 ```yaml
 e2e:
@@ -53,7 +46,7 @@ e2e:
       - Go to the team page
       - Change the team name to "e2e"
       - Click on the "Save" button
-      - Check that the team name is "e2e"
+      - Check that the team name is "e2e" # use words like "Check that" to assert the results of the test
 ```
 
 Run the E2Etest
