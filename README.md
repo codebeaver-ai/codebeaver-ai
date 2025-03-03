@@ -157,6 +157,7 @@ You can configure CodeBeaver with a `codebeaver.yml` file. [Full documentation h
 
 - [✅] Unit tests
 - [✅] E2E Tests
+
 - [ ] Unit Tests: Add support for more languages and frameworks
 - [ ] Unit Tests: Add support for more testing frameworks
 - [ ] Integration Tests
