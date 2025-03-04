@@ -9,15 +9,18 @@ single_file_test_commands:
   - "npx vitest run --coverage $TEST_FILE --reporter=json --outputFile=vitest-results.json"
   - 'if [ -f "coverage/coverage-final.json" ]; then mv coverage/coverage-final.json coverage.json; else echo "Warn: coverage/coverage-final.json not found"; exit 1; fi'
 setup_commands:
+  - apt-get update -qqy || true
+  - apt-get install -qqy git || true
   - npm install --legacy-peer-deps
-  - npm install -g npx
-  - npm install -D vitest@latest ts-node
-  - npm install -D @vitest/coverage-v8@latest
-  - npm install -D @testing-library/react
-  - npm install -D @testing-library/jest-dom
-  - npm install -D @testing-library/user-event
-  - npm install -D jest-environment-jsdom
-  - npm install -D @vitest/coverage-istanbul
+  - npm install -g npx || true
+  - npm install --save-dev vitest@latest ts-node || true
+  - npm install --save-dev @vitest/coverage-v8@latest || true
+  - npm install --save-dev @testing-library/react || true
+  - npm install --save-dev @testing-library/dom || true
+  - npm install --save-dev @testing-library/jest-dom || true
+  - npm install --save-dev @testing-library/user-event || true
+  - npm install --save-dev jest-environment-jsdom || true
+  - npm install --save-dev @vitest/coverage-istanbul || true
 ignore:
   - "*prettierrc*"
   - "*eslintrc*"
@@ -29,3 +32,5 @@ ignore:
   - "*.config.js"
   - "*.config.ts"
   - "*.config.jsx"
+  - "*/config.*"
+  - "config.*"

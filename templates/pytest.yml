@@ -3,7 +3,7 @@ services:
   python:
     image: python:3.11-slim
 test_commands:
-  - coverage run --rcfile=.coveragerc -m pytest --show-capture=no --json-report
+  - coverage run --rcfile=.coveragerc -m pytest --show-capture=no --json-report --continue-on-collection-errors
   - coverage combine || true
   - coverage json -i || true
 single_file_test_commands:

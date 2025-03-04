@@ -11,6 +11,7 @@ single_file_test_commands:
 setup_commands:
   - bun install || true
   - '[ -z "$(bun pm ls | grep @testing-library/react)" ] && bun add -d @testing-library/react || true'
+  - '[ -z "$(bun pm ls | grep @testing-library/dom)" ] && bun add -d @testing-library/demo || true'
   - '[ -z "$(bun pm ls | grep @testing-library/jest-dom)" ] && bun add -d @testing-library/jest-dom || true'
   - '[ -z "$(bun pm ls | grep @testing-library/user-event)" ] && bun add -d @testing-library/user-event || true'
   - '[ -z "$(bun pm ls | grep jest-environment-jsdom)" ] && bun add -d jest-environment-jsdom || true'

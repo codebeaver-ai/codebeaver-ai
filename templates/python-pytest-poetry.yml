@@ -1,0 +1,45 @@
+main_service: python
+services:
+  python:
+    image: python:3.11-slim
+test_commands:
+  - export PATH="/root/.local/bin:$PATH"
+  - poetry run coverage run --rcfile=.coveragerc -m pytest --show-capture=no
+  - poetry run coverage combine || true
+  - poetry run coverage json -i || true
+
+single_file_test_commands:
+  - export PATH="/root/.local/bin:$PATH"
+  - poetry run coverage run -m pytest "$TEST_FILE"
+  - poetry run coverage json
+setup_commands:
+  - apt-get update -qqy || true && apt-get install -qqy curl apt-utils || true && apt-get install -qqy git || true
+  - python -m ensurepip --default-pip || true
+  - python -m pip install --upgrade pip || true
+  # Install poetry
+  - curl -sSL https://install.python-poetry.org | python3 -
+  - export PATH="/root/.local/bin:$PATH"
+  - if [ -f "pyproject.toml" ]; then poetry install --with dev --no-interaction --all-extras || true; fi
+  # Install dependencies using poetry - supporting both dependency styles
+  - poetry run python -c "import black" 2>/dev/null || (poetry add black --group dev 2>/dev/null || poetry add black --dev) || true
+  - poetry run python -c "import ruff" 2>/dev/null || (poetry add ruff --group dev 2>/dev/null || poetry add ruff --dev) || true
+  - poetry run python -c "import mypy" 2>/dev/null || (poetry add mypy --group dev 2>/dev/null || poetry add mypy --dev) || true
+  # Install required test dependencies if not already present
+  - poetry run python -c "import coverage" 2>/dev/null || (poetry add coverage --group dev 2>/dev/null || poetry add -G dev coverage) || true
+  - poetry run python -c "import pytest" 2>/dev/null || (poetry add pytest --group dev 2>/dev/null || poetry add -G dev pytest) || true
+  - poetry run python -c "import pytest_cov" 2>/dev/null || (poetry add "pytest-cov>=4.1.0" --group dev 2>/dev/null || poetry add "pytest-cov>=4.1.0" --dev) || true
+  - poetry run python -c "import pytest_json_report" 2>/dev/null || (poetry add pytest-json-report --group dev 2>/dev/null || poetry add pytest-json-report --dev) || true
+  - poetry run python -c "import pytest_django" 2>/dev/null || (poetry run python -c "import django" 2>/dev/null && (poetry add pytest-django --group dev 2>/dev/null || poetry add pytest-django --dev)) || true
+  - poetry update --lock
+  # Add default coverage config if not present
+  - if [ ! -f ".coveragerc" ]; then echo "[run]\nrelative_files = True\nsource = .\ninclude =\n *.py\nomit =\n */test_*.py\n */*_test.py\n */tests/*\n */testing/*\n */test/*\n tests/**\n **/tests/**\n .tox/*\n /usr/*\n[report]\nshow_missing = True" > .coveragerc; fi
+ignore:
+  - "**/migrations"
+  - "**/*_initial.py"
+  - "**/*_auto_*.py"
+  - "*manage.py"
+  - "*__init__.py"
+  - "*__main__.py"
+  - "**/.venv/**"
+  - "**/virtualenv/**"
+  - "**/env/**"
