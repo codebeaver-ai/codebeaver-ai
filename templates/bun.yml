@@ -6,11 +6,12 @@ test_commands:
   - "bun test --coverage --coverageReporters=json --json --outputFile=jest-results.json --collectCoverageFrom='**/*.{js,jsx,ts,tsx}' --coveragePathIgnorePatterns='node_modules' --passWithNoTests || [ $? -eq 1 -o $? -eq 5 ]"
   - "if [ -f 'coverage/coverage-final.json' ]; then mv coverage/coverage-final.json coverage.json; else echo 'Warn: coverage/coverage-final.json not found'; exit 1; fi"
 single_file_test_commands:
-  - "bun test --coverage --coverageReporters=json --json --outputFile=jest-results.json --testPathPattern=$TEST_FILE --collectCoverageFrom=$TO_BE_COVERED_FILE --passWithNoTests || [ $? -eq 1 -o $? -eq 5 ]"
+  - "bun test --coverage --coverageReporters=json --json --outputFile=jest-results.json --testPathPattern=$TEST_FILE --collectCoverageFrom=$FILE_TO_COVER --passWithNoTests || [ $? -eq 1 -o $? -eq 5 ]"
   - "if [ -f 'coverage/coverage-final.json' ]; then mv coverage/coverage-final.json coverage.json; else echo 'Warn: coverage/coverage-final.json not found'; exit 1; fi"
 setup_commands:
   - bun install || true
   - '[ -z "$(bun pm ls | grep @testing-library/react)" ] && bun add -d @testing-library/react || true'
+  - '[ -z "$(bun pm ls | grep @testing-library/dom)" ] && bun add -d @testing-library/demo || true'
   - '[ -z "$(bun pm ls | grep @testing-library/jest-dom)" ] && bun add -d @testing-library/jest-dom || true'
   - '[ -z "$(bun pm ls | grep @testing-library/user-event)" ] && bun add -d @testing-library/user-event || true'
   - '[ -z "$(bun pm ls | grep jest-environment-jsdom)" ] && bun add -d jest-environment-jsdom || true'

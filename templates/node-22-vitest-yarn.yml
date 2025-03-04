@@ -1,0 +1,36 @@
+main_service: node
+services:
+  node:
+    image: node:22.13.1-slim
+test_commands:
+  - npx vitest run --coverage.include="**/*.{js,jsx,ts,tsx}" --coverage.all=true --reporter=json --outputFile=vitest-results.json
+  - 'if [ -f "coverage/coverage-final.json" ]; then mv coverage/coverage-final.json coverage.json; else echo "Warn: coverage/coverage-final.json not found"; exit 1; fi'
+single_file_test_commands:
+  - "npx vitest run --coverage $TEST_FILE --reporter=json --outputFile=vitest-results.json"
+  - 'if [ -f "coverage/coverage-final.json" ]; then mv coverage/coverage-final.json coverage.json; else echo "Warn: coverage/coverage-final.json not found"; exit 1; fi'
+setup_commands:
+  - apt-get update -qqy || true
+  - apt-get install -qqy git || true
+  - yarn install --legacy-peer-deps || true
+  - yarn list npx >/dev/null 2>&1 || (command -v npx >/dev/null 2>&1 || yarn global add npx) || true
+  - yarn list vitest >/dev/null 2>&1 || (command -v vitest >/dev/null 2>&1 || yarn add -D vitest@latest ts-node) || true
+  - yarn list @vitest/coverage-v8 >/dev/null 2>&1 || (command -v @vitest/coverage-v8 >/dev/null 2>&1 || yarn add -D @vitest/coverage-v8@latest) || true
+  - yarn list @testing-library/react >/dev/null 2>&1 || yarn add -D @testing-library/react || true
+  - yarn list @testing-library/dom >/dev/null 2>&1 || yarn add -D @testing-library/dom || true
+  - yarn list @testing-library/jest-dom >/dev/null 2>&1 || (command -v @testing-library/jest-dom >/dev/null 2>&1 || yarn add -D @testing-library/jest-dom) || true
+  - yarn list @testing-library/user-event >/dev/null 2>&1 || (command -v @testing-library/user-event >/dev/null 2>&1 || yarn add -D @testing-library/user-event) || true
+  - yarn list jest-environment-jsdom >/dev/null 2>&1 || (command -v jest-environment-jsdom >/dev/null 2>&1 || yarn add -D jest-environment-jsdom) || true
+  - yarn list @vitest/coverage-istanbul >/dev/null 2>&1 || (command -v @vitest/coverage-istanbul >/dev/null 2>&1 || yarn add -D @vitest/coverage-istanbul) || true
+ignore:
+  - "*prettierrc*"
+  - "*eslintrc*"
+  - "*stylelintrc*"
+  - "*commitlintrc*"
+  - "*lintstagedrc*"
+  - "*huskyrc*"
+  - "*config.test.*"
+  - "*.config.js"
+  - "*.config.ts"
+  - "*.config.jsx"
+  - "*/config.*"
+  - "config.*"

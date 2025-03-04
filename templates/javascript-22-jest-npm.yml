@@ -6,21 +6,24 @@ test_commands:
   - "npx jest --coverage --coverageReporters=json --json --outputFile=jest-results.json --collectCoverageFrom='**/*.{js,jsx}' --coveragePathIgnorePatterns='node_modules' --passWithNoTests || [ $? -eq 1 -o $? -eq 5 ]"
   - "if [ -f 'coverage/coverage-final.json' ]; then mv coverage/coverage-final.json coverage.json; else echo 'Warn: coverage/coverage-final.json not found'; exit 1; fi"
 single_file_test_commands:
-  - "npx jest --coverage --coverageReporters=json --json --outputFile=jest-results.json --testPathPattern=$TEST_FILE --collectCoverageFrom=$TO_BE_COVERED_FILE --passWithNoTests || [ $? -eq 1 -o $? -eq 5 ]"
+  - "npx jest --coverage --coverageReporters=json --json --outputFile=jest-results.json --testPathPattern=$TEST_FILE --collectCoverageFrom=$FILE_TO_COVER --passWithNoTests || [ $? -eq 1 -o $? -eq 5 ]"
   - "if [ -f 'coverage/coverage-final.json' ]; then mv coverage/coverage-final.json coverage.json; else echo 'Warn: coverage/coverage-final.json not found'; exit 1; fi"
 setup_commands:
+  - apt-get update -qqy || true
+  - apt-get install -qqy git || true
   - npm install -g pnpm
-  - pnpm install
-  - pnpm add jest
-  - pnpm add jest-json-reporter
-  - pnpm add -D babel
-  - pnpm add @babel/core
-  - pnpm add @babel/preset-env
-  - pnpm add @babel/preset-react
-  - pnpm add @testing-library/react
-  - pnpm add @testing-library/jest-dom
-  - pnpm add @testing-library/user-event
-  - pnpm add jest-environment-jsdom
+  - npm install || true
+  - npm --save-dev install jest || true
+  - npm --save-dev install jest-json-reporter || true
+  - npm --save-dev install babel || true
+  - npm --save-dev install @babel/core || true
+  - npm --save-dev install @babel/preset-env || true
+  - npm --save-dev install @babel/preset-react || true
+  - npm --save-dev install @testing-library/react || true
+  - npm --save-dev install @testing-library/dom || true
+  - npm --save-dev install @testing-library/jestdom || true
+  - npm --save-dev install @testing-library/user-event || true
+  - npm --save-dev install jest-environment-jsdom || true
   - '[ -f babel.config.js ] || echo ''module.exports={presets:[["@babel/preset-env",{targets:{node:"current"}}],"@babel/preset-typescript",["@babel/preset-react",{runtime:"automatic"}]]}'' > babel.config.js'
   - "[ -f jest.config.js ] || echo 'module.exports={testEnvironment:\"jsdom\",transform:{\".+\\\\.(js|jsx)$\":\"babel-jest\"}}' > jest.config.js"
 ignore:
@@ -33,3 +36,5 @@ ignore:
   - "*config.test.*"
   - "*.config.js"
   - "*.config.jsx"
+  - "*/config.*"
+  - "config.*"
