@@ -151,7 +151,6 @@ You can configure CodeBeaver with a `codebeaver.yml` file. [Full documentation h
 - [CodeBeaver Cloud docs](https://docs.codebeaver.ai/getting-started/quickstart)
 - [Configure with codebeaver.yml](https://docs.codebeaver.ai/configuration)
 - E2E is powered by [BrowserUse](https://github.com/browser-use/browser-use)
-- LLM is powered by [OpenAI](https://openai.com)
 
 ## Roadmap
 
