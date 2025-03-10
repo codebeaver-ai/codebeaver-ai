@@ -113,20 +113,26 @@ jobs:
 
 ### Commands
 
-- `codebeaver run`: Runs both unit and E2E tests defined in codebeaver.yml
+- `codebeaver`: Without any command, runs both unit and E2E tests if defined in codebeaver.yml
 - `codebeaver unit`: Generates and runs unit tests for a specific file
 - `codebeaver e2e`: Runs end-to-end tests defined in codebeaver.yml
 
 ### Command Options
 
+#### Global Options
+
+- `-v, --verbose`: Enable verbose logging output
+- `--version`: Display CodeBeaver version number
+
 #### Unit Test Command
 
 ```bash
-codebeaver unit --file <file_path> [--template <template_name>] [--verbose]
+codebeaver unit --file <file_path> [--template <template_name>] [--max-files-to-test <number>] [--verbose]
 ```
 
 - `--file`: (Required) Path to the file to analyze
 - `--template`: (Optional) Testing framework template to use (e.g., pytest, jest, vitest). If not specified, uses template from codebeaver.yml
+- `--max-files-to-test`: (Optional) Maximum number of files to generate unit tests for (default: 10)
 - `-v, --verbose`: (Optional) Enable verbose logging output
 
 #### E2E Test Command

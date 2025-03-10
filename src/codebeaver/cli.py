@@ -88,9 +88,9 @@ CodeBeaver helps you generate and run tests for your code using AI. It supports:
 - Multiple testing frameworks (pytest, jest, vitest)
 
 Examples:
-  codebeaver run # Runs e2e and unit tests defined in codebeaver.yml
+  codebeaver     # Runs both e2e and unit tests if defined in codebeaver.yml
   codebeaver unit   # Generate unit tests for the current project
-  codebeaver e2e          # Run end-to-end tests defined in codebeaver.yml
+  codebeaver e2e    # Run end-to-end tests defined in codebeaver.yml
 """,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
@@ -182,16 +182,42 @@ Examples:
         logger.error("OPENAI_API_KEY environment variable is not set")
         sys.exit(1)
 
-    if args.command == "run":
-        run_unit_command(args)
-        run_e2e_command(args)
-    elif args.command == "unit":
-        run_unit_command(args)
-    elif args.command == "e2e":
-        run_e2e_command(args)
+    # If no command specified, try to run both unit and e2e tests based on config
+    if not args.command:
+        try:
+            with open("codebeaver.yml", "r") as f:
+                config = yaml.safe_load(f)
+                
+            if "unit" in config:
+                logger.info("Running unit tests...")
+                args.command = "unit"
+                run_unit_command(args)
+            else:
+                logger.info("No unit tests configured in codebeaver.yml, skipping...")
+                
+            if "e2e" in config:
+                logger.info("Running e2e tests...")
+                args.command = "e2e"
+                run_e2e_command(args)
+            else:
+                logger.info("No e2e tests configured in codebeaver.yml, skipping...")
+                
+            if "unit" not in config and "e2e" not in config:
+                logger.error("No tests configured in codebeaver.yml")
+                sys.exit(1)
+                
+        except FileNotFoundError:
+            logger.error("Could not find codebeaver.yml")
+            sys.exit(1)
     else:
-        logger.error("Error: Please specify a valid command (unit or e2e)")
-        sys.exit(1)
+        # Handle specific commands as before
+        if args.command == "unit":
+            run_unit_command(args)
+        elif args.command == "e2e":
+            run_e2e_command(args)
+        else:
+            logger.error("Error: Please specify a valid command (unit or e2e)")
+            sys.exit(1)
 
 
 def run_unit_command(args):
