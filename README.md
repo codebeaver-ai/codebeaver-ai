@@ -48,7 +48,7 @@ unit:
   from: pytest # The Unit testing framework you want to use
 ```
 
-Run it! You need to have an OpenAI API key and Chrome installed.
+That's it. To run it, you need to have an OpenAI API key and Chrome installed.
 
 ```bash
 export OPENAI_API_KEY="your-openai-api-key"
@@ -70,7 +70,12 @@ login-test: Success!
 🐛 Found 1 bug
 ```
 
-## GitHub Actions
+## Examples
+
+- [CodeBeaver discovers a bug and explains where the problem is](https://github.com/codebeaver-ai/codebeaver-ai/pull/8)
+- [CodeBeaver updates a test given the new code commited](https://github.com/codebeaver-ai/codebeaver-ai/pull/12)
+
+## GitHub Action
 
 CodeBeaver can be used in a GitHub Action to run unit tests on every commit and E2E tests after you release a new version.
 
@@ -101,11 +106,6 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           STARTING_URL: "http://yourstaging.yourwebsite.com"
 ```
-
-## Examples
-
-- [CodeBeaver discovers a bug and explains where the problem is](https://github.com/codebeaver-ai/codebeaver-ai/pull/8)
-- [CodeBeaver updates a test given the new code commited](https://github.com/codebeaver-ai/codebeaver-ai/pull/12)
 
 ## CLI Reference
 
