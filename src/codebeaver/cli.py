@@ -251,7 +251,13 @@ def run_unit_command(args):
             logger.error("Error: No workspace config found")
             sys.exit(1)
         logger.debug("Analyzing current project")
-        files, test_files = TestFilePattern(pathlib.Path.cwd(), workspace_config).list_files_and_tests()[:args.max_files_to_test]
+        files, test_files = TestFilePattern(pathlib.Path.cwd(), workspace_config).list_files_and_tests()
+        if len(files) > args.max_files_to_test:
+            logger.info(f"Found {len(files)} files to write tests for. Writing tests for the first {args.max_files_to_test} files.")
+            files = files[:args.max_files_to_test]
+        else:
+            logger.info(f"Found {len(files)} files to write tests for.")
+
         for i, file in enumerate(files):
             unit_test_manager = UnitTestManager(
                 file, 

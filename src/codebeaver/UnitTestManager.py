@@ -54,11 +54,11 @@ class UnitTestManager:
               raise UnitTestManager.CouldNotRunTests(f"Could not run tests for {self.file_path}: {test_result.stderr}")
       else:
           test_file = test_files_pattern.create_new_test_file(self.file_path)
-      max_tentatives = self.workspace_config.unit.max_attempts or 4
-      tentatives = 0
+      max_attempts = self.workspace_config.unit.max_attempts or 4
+      attempts = 0
       console = ""
       test_content = None
-      while tentatives < max_tentatives:
+      while attempts < max_attempts:
           test_generator = UnitTestGenerator(self.file_path)
           test_content = test_generator.generate_test(test_file, console)
 
@@ -73,14 +73,14 @@ class UnitTestManager:
               console += test_results.stdout
           if test_results.stderr:
               console += test_results.stderr
-          tentatives += 1
-          logger.info(f"Tentative {tentatives} of {max_tentatives}")
-          logger.info(f"errors: {test_results.stderr}")
-          console = f"Errors: {test_results.stderr}\nstdout: {test_results.stdout}\n"
+          attempts += 1
+          logger.debug(f"Attempt {attempts} of {max_attempts}")
+          logger.debug(f"Errors:\n\n{test_results.stderr}")
+          console = f"Errors:\n{test_results.stderr}\nstdout: {test_results.stdout}\n"
 
       logger.debug(f"TEST CONTENT: {test_content}")
       logger.debug(f"TEST FILE written to: {test_file}")
-      if tentatives >= max_tentatives:
+      if attempts >= max_attempts:
           logger.warning(f"Could not generate valid tests for {self.file_path}")
           raise UnitTestManager.CouldNotGenerateValidTests(f"""Could not generate valid tests for {self.file_path}
 
