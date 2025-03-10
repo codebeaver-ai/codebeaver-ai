@@ -711,7 +711,7 @@ class ContentCleaner:
         ]
 
         merged_content = "\n".join(result_parts).replace("\n\n\n", "\n\n")
-        logger.info("Merged content:\n\n" + merged_content)
+        logger.debug("Merged content:\n\n" + merged_content)
         try:
             ast.parse(merged_content)
             merged_content = black.format_str(merged_content, mode=black.Mode())
@@ -1203,7 +1203,7 @@ class ContentCleaner:
             .replace("// ... existing tests", "")
             .replace("\n\n\n", "\n\n")
         )
-        logger.info("Merged content:\n\n" + merged_content)
+        logger.debug("Merged content:\n\n" + merged_content)
         tree = parser.parse(bytes(merged_content, "utf8"))
         has_errors = False
         for node in tree.root_node.children:

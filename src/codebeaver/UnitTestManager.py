@@ -42,6 +42,7 @@ class UnitTestManager:
             raise UnitTestManager.CouldNotRunSetup(f"Could not run setup commands for {self.file_path}: {test_result.stderr}")
       test_files_pattern = TestFilePattern(pathlib.Path.cwd(), workspace_config=self.workspace_config)
       test_file = test_files_pattern.find_test_file(self.file_path)
+      logger.info(f"Writing tests for {self.file_path} at {test_file}")
       if test_file:
           test_result = testrunner.run_test(self.file_path, test_file)
           if (
@@ -73,11 +74,15 @@ class UnitTestManager:
           if test_results.stderr:
               console += test_results.stderr
           tentatives += 1
-          logger.debug(f"Tentative {tentatives} of {max_tentatives}")
-          logger.debug(f"errors: {test_results.stderr}")
+          logger.info(f"Tentative {tentatives} of {max_tentatives}")
+          logger.info(f"errors: {test_results.stderr}")
+          console = f"Errors: {test_results.stderr}\nstdout: {test_results.stdout}\n"
 
       logger.debug(f"TEST CONTENT: {test_content}")
       logger.debug(f"TEST FILE written to: {test_file}")
       if tentatives >= max_tentatives:
           logger.warning(f"Could not generate valid tests for {self.file_path}")
-          raise UnitTestManager.CouldNotGenerateValidTests(f"Could not generate valid tests for {self.file_path}")
+          raise UnitTestManager.CouldNotGenerateValidTests(f"""Could not generate valid tests for {self.file_path}
+
+{console}
+""")

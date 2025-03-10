@@ -64,7 +64,3 @@ include = ["src/codebeaver"]
 
 [tool.hatch.build.targets.wheel.sources]
 "src/codebeaver" = "codebeaver"
-"templates" = "codebeaver/templates"
-
-[tool.hatch.build.force-include]
-"templates" = "codebeaver/templates"

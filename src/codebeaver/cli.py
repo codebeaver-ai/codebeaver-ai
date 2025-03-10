@@ -113,7 +113,7 @@ Examples:
     unit_parser.add_argument(
         "--file",
         type=valid_file_path,
-        required=True,
+        required=False,
         help="Path to the file to analyze",
         dest="file_path"
     )
@@ -205,7 +205,7 @@ Examples:
 
 
 def run_unit_command(args):
-    """Run the unit test command (previously 'run')."""
+    """Run the unit test command"""
     logger = logging.getLogger('codebeaver')
     
     workspace_config = None
@@ -216,10 +216,10 @@ def run_unit_command(args):
                 config = yaml.safe_load(f)
                 workspace_config = CodeBeaverConfig.from_yaml(config)
                 if "unit" not in config:
-                    logger.error(f"No unit tests defined in {args.yaml_file}")
-                    sys.exit(1)
+                    logger.info("No Unit Test defintion in codebeaver.yml. Check the README at https://github.com/codebeaver-ai/codebeaver-ai for more information.")
+                    sys.exit(2)
                 if "from" not in config["unit"]:
-                    logger.error(f"No template specified in {args.yaml_file}")
+                    logger.error("No template specified in codebeaver.yml")
                     sys.exit(1)
                 args.template = config["unit"]["from"]
         except FileNotFoundError:
