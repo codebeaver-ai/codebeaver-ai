@@ -336,3 +336,140 @@ class TestE2E:
         dump = test_obj.model_dump()
         expected_keys = {"steps", "url", "passed", "errored", "comment", "name"}
         assert set(dump.keys()) == expected_keys
+    @pytest.mark.asyncio
+    async def test_run_with_incomplete_test_definition(self, tmp_path, monkeypatch):
+        """Test that run() raises a KeyError when a test definition is missing a required field (url)."""
+        monkeypatch.chdir(tmp_path)
+        tests_dict = {
+            "TestIncomplete": {"steps": ["step1"]}  # missing 'url'
+        }
+        e2e = E2E(tests=tests_dict)
+        with pytest.raises(KeyError):
+            await e2e.run()
+
+    @pytest.mark.asyncio
+    async def test_run_test_empty_string_step(self, monkeypatch):
+        """Test run_test with an empty string step to ensure it is handled as a valid (albeit trivial) step."""
+        e2e = E2E(tests={})
+        # Create a test with an empty string as step.
+        test_obj = End2endTest(name="TestEmptyStringStep", steps=[""], url="http://example.com")
+        result = await e2e.run_test(test_obj)
+        # Since the empty step does not trigger any simulation, we expect a success.
+        assert result.passed is True
+        assert result.comment == "Test succeeded"
+        assert result.errored is False
+    @pytest.mark.asyncio
+    async def test_run_test_wrong_type_return(self, monkeypatch):
+        """Test that run_test raises an exception when final_result returns an unexpected non-string value."""
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="TestWrongType", steps=["simulate_wrong_type"], url="http://example.com")
+        monkeypatch.setattr(FakeHistory, "final_result", lambda self: 123)
+        with pytest.raises(Exception):
+            await e2e.run_test(test_obj)
+    async def test_run_test_empty_result_string(self, monkeypatch):
+        """Test run_test when agent.run returns an empty string as final_result.
+        This should mark the test as errored with a "No result from the test" comment.
+        """
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="TestEmptyResult", steps=["simulate_empty_result"], url="http://example.com")
+        monkeypatch.setattr(FakeHistory, "final_result", lambda self: "")
+        result = await e2e.run_test(test_obj)
+        assert result.errored is True
+        assert result.comment == "No result from the test"
+
+    def test_end2endtest_steps_none(self):
+        """Test that End2endTest raises a validation error when steps is None."""
+        with pytest.raises(ValidationError):
+            End2endTest(name="NoneSteps", steps=None, url="http://example.com")
+    async def test_invalid_url_type(self):
+        """Test that End2endTest raises a validation error when URL is not a string."""
+        with pytest.raises(ValidationError):
+            End2endTest(name="InvalidURL", steps=["step1"], url=123)
+
+    async def test_run_called_twice(self, tmp_path, monkeypatch):
+        """Test that calling run() twice rewrites the e2e.json file with updated results."""
+        monkeypatch.chdir(tmp_path)
+        tests_dict = {
+            "TestCall": {"steps": ["step1"], "url": "http://example.com"}
+        }
+        e2e = E2E(tests=tests_dict)
+        # First run – expect success results.
+        first_results = await e2e.run()
+        with open("e2e.json", "r") as f:
+            first_data = json.load(f)
+        assert any(test["name"] == "TestCall" and test["passed"] for test in first_data)
+        # Now update the test to simulate failure.
+        tests_dict["TestCall"]["steps"] = ["simulate_failure"]
+        second_results = await e2e.run()
+        with open("e2e.json", "r") as f:
+            second_data = json.load(f)
+        # Check that in the second run the test now fails.
+        assert any(test["name"] == "TestCall" and not test["passed"] and test["comment"] == "Failed test simulated" for test in second_data)
+    @pytest.mark.asyncio
+    async def test_run_test_slow_agent(self, monkeypatch):
+        """Test run_test correctly awaits a slow agent.run method that simulates a delay."""
+        async def slow_run(self):
+            await asyncio.sleep(0.1)
+            return FakeHistory(self.task)
+        monkeypatch.setattr(FakeAgent, "run", slow_run)
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="TestSlowAgent", steps=["step1"], url="http://example.com")
+        result = await e2e.run_test(test_obj)
+        assert result.passed is True
+        assert result.comment == "Test succeeded"
+
+    @pytest.mark.asyncio
+    async def test_run_test_blank_string_step(self):
+        """Test run_test with a blank string step ensuring it is treated as a valid (trivial) step."""
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="TestBlankStep", steps=["    "], url="http://example.com")
+        result = await e2e.run_test(test_obj)
+        assert result.passed is True
+        assert result.comment == "Test succeeded"
+        assert result.errored is False
+    
+    @pytest.mark.asyncio
+    async def test_run_test_null_passed_field(self, monkeypatch):
+        """Test that run_test raises an exception when the agent's final result has a null 'passed' field."""
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="TestNullPassed", steps=["simulate_null_passed"], url="http://example.com")
+        monkeypatch.setattr(FakeHistory, "final_result", lambda self: json.dumps({"passed": None, "comment": "Null passed"}))
+        with pytest.raises(Exception):
+            await e2e.run_test(test_obj)
+    @pytest.mark.asyncio
+    async def test_run_invalid_tests_not_dict(self):
+        """Test that run() raises an exception when tests is not a dict."""
+        e2e = E2E(tests=[])  # passing a list instead of a dict
+        with pytest.raises(AttributeError):
+            await e2e.run()
+    @pytest.mark.asyncio
+    async def test_run_with_incomplete_test_definition_missing_steps(self, tmp_path, monkeypatch):
+        """Test that run() raises a KeyError when a test definition is missing the 'steps' field."""
+        monkeypatch.chdir(tmp_path)
+        tests_dict = {
+            "TestIncompleteSteps": {"url": "http://example.com"}  # missing 'steps'
+        }
+        e2e = E2E(tests=tests_dict)
+        with pytest.raises(KeyError):
+            await e2e.run()
+
+    @pytest.mark.asyncio
+    async def test_run_test_cancelled(self, monkeypatch, tmp_path):
+        """Test that run_test propagates asyncio.CancelledError when Agent.run is cancelled,
+        and that run() raises an exception when tests is None.
+        Also, verifies that monkey-patched Agent.run raising asyncio.CancelledError is handled properly.
+        """
+        e2e = E2E(tests={})
+        monkeypatch.setattr("codebeaver.E2E.Agent.run", lambda self: (_ for _ in ()).throw(asyncio.CancelledError("Cancelled")))
+        test_obj = End2endTest(name="TestCancelled", steps=["step1"], url="http://example.com")
+        with pytest.raises(asyncio.CancelledError, match="Cancelled"):
+            await e2e.run_test(test_obj)
+        # Test that run() raises an exception when tests is None instead of a dict.
+        os.chdir(tmp_path)
+        e2e = E2E(tests=None)
+        with pytest.raises(AttributeError):
+            await e2e.run()
+        # Patch Agent.run to raise asyncio.CancelledError again
+        monkeypatch.setattr("codebeaver.E2E.Agent.run", lambda self: (_ for _ in ()).throw(asyncio.CancelledError("Cancelled")))
+        with pytest.raises(asyncio.CancelledError, match="Cancelled"):
+            await e2e.run_test(test_obj)
