@@ -90,7 +90,7 @@ jobs:
   unit-tests:
     runs-on: ubuntu-latest
     steps:
-      - uses: codebeaver-ai/codebeaver-os-action@0.1.0
+      - uses: codebeaver-ai/codebeaver-oss-action@0.1.0
         with:
           action-type: "unit"
         env:
