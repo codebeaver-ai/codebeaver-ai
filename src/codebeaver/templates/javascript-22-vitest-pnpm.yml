@@ -9,15 +9,19 @@ single_file_test_commands:
   - "npx vitest run --coverage $TEST_FILE --reporter=json --outputFile=vitest-results.json"
   - 'if [ -f "coverage/coverage-final.json" ]; then mv coverage/coverage-final.json coverage.json; else echo "Warn: coverage/coverage-final.json not found"; exit 1; fi'
 setup_commands:
+  - apt-get update -qqy || true
+  - apt-get install -qqy git || true
   - npm install -g pnpm
   - pnpm install --silent || true
-  - pnpm list vitest >/dev/null 2>&1 || pnpm add -D vitest@latest
-  - pnpm list @vitest/coverage-v8 >/dev/null 2>&1 || pnpm add -D @vitest/coverage-v8@latest
-  - pnpm list @testing-library/react >/dev/null 2>&1 || pnpm add -D @testing-library/react
-  - pnpm list @testing-library/jest-dom >/dev/null 2>&1 || pnpm add -D @testing-library/jest-dom
-  - pnpm list @testing-library/user-event >/dev/null 2>&1 || pnpm add -D @testing-library/user-event
-  - pnpm list jsdom >/dev/null 2>&1 || pnpm add -D jsdom
-  - "[ -f vitest.config.js ] || echo 'import { defineConfig } from \"vitest/config\"; export default defineConfig({test:{environment:\"jsdom\",coverage:{provider:\"v8\",reporter:[\"text\",\"json\",\"html\"]}},});' > vitest.config.js"
+  - pnpm add -D vitest@latest || true
+  - pnpm add -D @vitest/coverage-v8@latest || true
+  - pnpm add -D @vitest/coverage-istanbul || true
+  - pnpm add -D @testing-library/react || true
+  - pnpm add -D @testing-library/dom || true
+  - pnpm add -D @testing-library/jest-dom || true
+  - pnpm add -D @testing-library/user-event || true
+  - pnpm add -D jsdom || true
+  - '[ -f vitest.config.js ] || echo ''import { defineConfig } from "vitest/config"; export default defineConfig({test:{environment:"jsdom",coverage:{provider:"v8",reporter:["text","json","html"]}},});'' > vitest.config.js'
 ignore:
   - "*prettierrc*"
   - "*eslintrc*"
@@ -28,3 +32,5 @@ ignore:
   - "*config.test.*"
   - "*.config.js"
   - "*.config.jsx"
+  - "*/config.*"
+  - "config.*"

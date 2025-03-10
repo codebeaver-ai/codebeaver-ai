@@ -10,7 +10,6 @@ from pathlib import Path
 
 logger = logging.getLogger('codebeaver')
 
-
 class UnitTestManager:
     class CouldNotRunTests(Exception):
         pass

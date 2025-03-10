@@ -68,8 +68,6 @@ login-test: Success!
 
 🔄 1 test added and 1 test updated to reflect recent changes.
 🐛 Found 1 bug
-
-See codebeaver-report.md for more details
 ```
 
 ## GitHub Actions

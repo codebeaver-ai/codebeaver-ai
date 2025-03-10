@@ -1,0 +1,45 @@
+main_service: php
+services:
+  php:
+    image: php:8.1-cli
+test_commands:
+  - XDEBUG_MODE=coverage vendor/bin/phpunit --coverage-filter src --coverage-clover=coverage.xml --log-junit=junit.xml
+single_file_test_commands:
+  - XDEBUG_MODE=coverage vendor/bin/phpunit "$TEST_FILE" --coverage-filter src --coverage-clover=coverage.xml --log-junit=junit.xml
+setup_commands:
+  - apt-get update && apt-get install -y git unzip libzip-dev zlib1g-dev libxml2-dev && docker-php-ext-install zip xml
+  - pecl install xdebug && docker-php-ext-enable xdebug
+  - curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+  - if [ -f "composer.json" ]; then composer install --no-interaction --no-progress; fi
+  - if [ ! -f "vendor/bin/phpunit" ]; then composer require --dev phpunit/phpunit; fi
+  - if [ ! -f "vendor/bin/phpcs" ]; then composer require --dev squizlabs/php_codesniffer; fi
+  - if [ ! -f "vendor/bin/phpstan" ]; then composer require --dev phpstan/phpstan; fi
+  - if [ -f "artisan" ]; then composer require --dev laravel/dusk || true; fi
+  - if [ -f "bin/console" ]; then composer require --dev symfony/phpunit-bridge || true; fi
+  - if [ ! -f "phpunit.xml" ] && [ ! -f "phpunit.xml.dist" ]; then echo '<?xml version="1.0" encoding="UTF-8"?>
+    <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+    bootstrap="vendor/autoload.php"
+    colors="true">
+    <testsuites>
+    <testsuite name="Unit Tests">
+    <directory>tests</directory>
+    </testsuite>
+    </testsuites>
+    <coverage>
+    <include>
+    <directory suffix=".php">src</directory>
+    </include>
+    </coverage>
+    </phpunit>' > phpunit.xml; fi
+ignore:
+  - "**/vendor/**"
+  - "**/node_modules/**"
+  - "**/public/**"
+  - "**/storage/**"
+  - "**/bootstrap/cache/**"
+  - "**/resources/**"
+  - "**/database/migrations/**"
+  - "**/database/seeds/**"
+  - "**.blade.**"
+  - "**.json"

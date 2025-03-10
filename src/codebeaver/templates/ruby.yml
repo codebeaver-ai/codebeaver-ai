@@ -1,0 +1,45 @@
+main_service: ruby
+services:
+  ruby:
+    image: ruby:3.4.1-slim
+test_commands:
+  - "bundle exec rake test:all || bundle exec rails test || bundle exec rspec --format json --out rspec-results.json"
+  - 'bundle exec rake simplecov || bundle exec rails coverage:report || (mkdir -p coverage) && bundle exec rails runner ''require "simplecov"; SimpleCov.collate Dir["coverage/.resultset.json"], "rails" do; SimpleCov.formatter = SimpleCov::Formatter::JSONFormatter; end'') || true'
+  - "if [ -f 'coverage/.resultset.json' ]; then cp coverage/.resultset.json coverage.json; elif [ -f 'coverage/coverage.json' ]; then cp coverage/coverage.json coverage.json; fi"
+single_file_test_commands:
+  - 'bundle exec rails test "$TEST_FILE" || [ $? -eq 1 -o $? -eq 5 ]'
+  - 'bundle exec rspec "$TEST_FILE" --format json --out rspec-results.json || true'
+  - 'bundle exec rails runner ''require "simplecov"; SimpleCov.result.format!'''
+  - "if [ -f 'coverage/.resultset.json' ]; then cp coverage/.resultset.json coverage.json; elif [ -f 'coverage/coverage.json' ]; then cp coverage/coverage.json coverage.json; fi"
+setup_commands:
+  - "apt-get update -qqy || true"
+  - "apt-get install -qqy git build-essential libpq-dev nodejs sqlite3 libsqlite3-dev || true"
+  - "gem install bundler --no-document || true"
+  - "gem install rails --no-document || true"
+  - "bundle install --jobs=4 --retry=3 ||  true"
+  - "bundle config set --local with 'test'"
+  - "bundle add simplecov simplecov-json rspec-rails minitest-reporters || true"
+  - "if [ ! -f \"config/database.yml\" ]; then mkdir -p config && echo -e 'default: &default\n  adapter: postgresql\n  encoding: unicode\n  host: postgres\n  username: postgres\n  password: postgres\n  pool: 5\n\ntest:\n  <<: *default\n  database: test' > config/database.yml; fi"
+  - "bundle exec rails generate rspec:install || true"
+  - 'if [ ! -f "spec/rails_helper.rb" ] && [ -d "spec" ]; then mkdir -p spec && echo -e ''require "spec_helper"\nENV["RAILS_ENV"] ||= "test"\nrequire File.expand_path("../config/environment", __dir__)\nabort("The Rails environment is running in production mode!") if Rails.env.production?\nrequire "rspec/rails"\nbegin\n  ActiveRecord::Migration.maintain_test_schema!\nrescue ActiveRecord::PendingMigrationError => e\n  puts e.to_s.strip\n  exit 1\nend\nRSpec.configure do |config|\n  config.fixture_path = "\#{::Rails.root}/spec/fixtures"\n  config.use_transactional_fixtures = true\n  config.infer_spec_type_from_file_location!\n  config.filter_rails_from_backtrace!\nend'' > spec/rails_helper.rb; fi'
+  - "if [ ! -f \"spec/spec_helper.rb\" ] && [ -d \"spec\" ]; then mkdir -p spec && echo -e 'RSpec.configure do |config|\n  config.expect_with :rspec do |expectations|\n    expectations.include_chain_clauses_in_custom_matcher_descriptions = true\n  end\n  config.mock_with :rspec do |mocks|\n    mocks.verify_partial_doubles = true\n  end\n  config.shared_context_metadata_behavior = :apply_to_host_groups\nend' > spec/spec_helper.rb; fi"
+  - "if [ ! -f \".simplecov\" ]; then echo -e 'SimpleCov.start \"rails\" do\n  add_filter \"/test/\"\n  add_filter \"/spec/\"\n  add_filter \"/config/\"\n  add_filter \"/db/\"\n  add_filter \"/vendor/\"\nend' > .simplecov; fi"
+ignore:
+  - "db/schema.rb"
+  - "db/migrate/**/*"
+  - "bin/**/*"
+  - "config/**/*"
+  - "public/**/*"
+  - "vendor/**/*"
+  - "node_modules/**/*"
+  - "tmp/**/*"
+  - "log/**/*"
+  - "app/assets/**/*"
+  - "spec/rails_helper.rb"
+  - "spec/spec_helper.rb"
+  - "lib/tasks/**/*"
+  - "test/test_helper.rb"
+  - "*.gemspec"
+  - "Gemfile"
+  - "Gemfile.lock"
+  - "Rakefile"

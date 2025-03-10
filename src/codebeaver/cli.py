@@ -8,6 +8,8 @@ import os
 import pathlib
 import logging
 
+from codebeaver.reporting import Report
+
 from .CodebeaverConfig import CodeBeaverConfig
 from .TestFilePattern import TestFilePattern
 from .UnitTestManager import UnitTestManager
@@ -265,7 +267,6 @@ def run_e2e_command(args):
     """Run the e2e test command (mocked for now)."""
     logger = logging.getLogger('codebeaver')
     logger.debug(f"E2E testing with YAML file: {args.yaml_file}")
-    logger.debug("E2E testing functionality is not yet implemented.")
 
     try:
         with open(args.yaml_file, "r") as f:
@@ -277,7 +278,9 @@ def run_e2e_command(args):
                 yaml_content["e2e"],
                 chrome_instance_path="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
             )
-            asyncio.run(e2e.run())
+            e2e_tests = asyncio.run(e2e.run())
+            report = Report(e2e_tests)
+            report.to_console()
     except Exception as e:
         logger.error(f"Error reading YAML file: {e}")
         sys.exit(1)

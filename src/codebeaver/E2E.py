@@ -1,10 +1,5 @@
 import os
-import sys
 import json
-
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-import asyncio
 
 from browser_use import Agent, Controller
 from browser_use.browser.browser import Browser, BrowserConfig
@@ -54,10 +49,10 @@ class E2E:
         if os.getenv("CHROME_INSTANCE_PATH"):
             self.chrome_instance_path = os.getenv("CHROME_INSTANCE_PATH")
 
-    async def run(self):
+    async def run(self) -> list[End2endTest]:
         all_tests: list[End2endTest] = []
         for test_name, test in self.tests.items():
-            print("Running test: ", test_name)
+            logger.debug(f"Running E2E: {test_name}")
             test = End2endTest(
                 name=test_name,
                 steps=test["steps"],
@@ -66,16 +61,8 @@ class E2E:
             test_result = await self.run_test(test)
             all_tests.append(test_result)
         # write the results to e2e.json
-        with open("e2e.json", "w") as f:
-            json.dump([test.model_dump() for test in all_tests], f)
-        total_passed = sum(1 for test in all_tests if test.passed)
-        print(f"🖥️ {total_passed}/{len(all_tests)} E2E tests passed")
-        print("-" * 80)
-        print("Name", "Passed", "Comment")
-        print("-" * 80)
-        for test in all_tests:
-            print(test.name, test.passed, test.comment)
-        print("-" * 80)
+        # with open("e2e.json", "w") as f:
+        #     json.dump([test.model_dump() for test in all_tests], f)
         return all_tests
 
     async def run_test(self, test: End2endTest) -> End2endTest:
