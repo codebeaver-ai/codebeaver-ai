@@ -52,7 +52,7 @@ Run it! You need to have an OpenAI API key and Chrome installed.
 
 ```bash
 export OPENAI_API_KEY="your-openai-api-key"
-codebeaver run
+codebeaver
 
 ```
 
@@ -159,7 +159,6 @@ CodeBeaver currently supports:
 ## Resources
 
 - [CodeBeaver Cloud docs](https://docs.codebeaver.ai/getting-started/quickstart)
-- [Configure with codebeaver.yml](https://docs.codebeaver.ai/configuration)
 - E2E is powered by [BrowserUse](https://github.com/browser-use/browser-use)
 
 ## Roadmap

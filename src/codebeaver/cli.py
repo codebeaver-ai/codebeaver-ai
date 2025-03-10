@@ -190,8 +190,14 @@ Examples:
                 
             if "unit" in config:
                 logger.info("Running unit tests...")
-                args.command = "unit"
-                run_unit_command(args)
+                # Create new args for unit command
+                unit_args = argparse.Namespace()
+                unit_args.template = None
+                unit_args.file_path = None
+                unit_args.max_files_to_test = 10
+                unit_args.verbose = args.verbose
+                unit_args.yaml_file = "codebeaver.yml"  # For error messages
+                run_unit_command(unit_args)
             else:
                 logger.info("No unit tests configured in codebeaver.yml, skipping...")
                 
@@ -261,15 +267,10 @@ def run_unit_command(args):
     file_path = args.file_path
     if file_path:
         logger.info(f"Analyzing file: {args.file_path}")
-    else:
-        logger.info("Analyzing current project")
-
-
-    file_content = open(args.file_path).read()
-    if not file_content or file_content == "":
-        logger.error("Error: File is empty")
-        sys.exit(1)
-    if file_path:
+        file_content = open(args.file_path).read()
+        if not file_content or file_content == "":
+            logger.error("Error: File is empty")
+            sys.exit(1)
         unit_test_manager = UnitTestManager(
             args.file_path, 
             single_file_test_commands, 
