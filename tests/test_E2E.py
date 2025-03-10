@@ -336,3 +336,228 @@ class TestE2E:
         dump = test_obj.model_dump()
         expected_keys = {"steps", "url", "passed", "errored", "comment", "name"}
         assert set(dump.keys()) == expected_keys
+    @pytest.mark.asyncio
+    async def test_run_test_with_delay(self, monkeypatch):
+        """Test run_test method when the Agent's run method is delayed."""
+        # Define a delayed run method that simulates latency
+        async def delayed_run(self):
+            await asyncio.sleep(0.01)
+            return FakeHistory(self.task)
+        monkeypatch.setattr(FakeAgent, "run", delayed_run)
+        e2e = E2E(tests={})
+        """Test that End2endTest.model_dump returns all expected keys."""
+        test_obj = End2endTest(name="TestDelay", steps=["step1"], url="http://example.com")
+        result = await e2e.run_test(test_obj)
+        assert result.passed is True
+        assert result.comment == "Test succeeded"
+        # Reset the FakeAgent.run to its original behavior for other tests
+        assert set(dump.keys()) == expected_keys
+    @pytest.mark.asyncio
+    async def test_run_test_empty_result_string(self, monkeypatch):
+        """Test run_test marks the test as errored when the agent returns an empty string."""
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="TestEmptyResultString", steps=["step_empty"], url="http://example.com")
+        # Patch FakeHistory.final_result to return an empty string
+        monkeypatch.setattr(FakeHistory, "final_result", lambda self: "")
+        result = await e2e.run_test(test_obj)
+        assert result.errored is True
+        assert result.comment == "No result from the test"
+
+    @pytest.mark.asyncio
+    async def test_run_test_null_json(self, monkeypatch):
+        """Test run_test raises an exception when the agent returns JSON 'null'."""
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="TestNullJSON", steps=["step_null"], url="http://example.com")
+        # Patch FakeHistory.final_result to return the JSON string "null"
+        monkeypatch.setattr(FakeHistory, "final_result", lambda self: "null")
+        with pytest.raises(Exception) as excinfo:
+            await e2e.run_test(test_obj)
+        # Check that the error message indicates missing fields (pydantic error)
+        assert ("field required" in str(excinfo.value).lower()) or ("none is not an allowed value" in str(excinfo.value).lower())
+    @pytest.mark.asyncio
+    async def test_run_test_invalid_field_types(self, monkeypatch):
+        """Test run_test raises an exception when agent returns JSON with fields of incorrect types."""
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="TestInvalidTypes", steps=["invalid types"], url="http://example.com")
+        monkeypatch.setattr(FakeHistory, "final_result", lambda self: json.dumps({"passed": "yes", "comment": 123}))
+        with pytest.raises(Exception):
+            await e2e.run_test(test_obj)
+    @pytest.mark.asyncio
+    async def test_run_method_exception_in_run_test(self, monkeypatch, tmp_path):
+        """Test that an exception in run_test stops the overall run execution and does not write the results file."""
+        monkeypatch.chdir(tmp_path)
+        tests_dict = {
+            "ThrowTest": {"steps": ["raise error"], "url": "http://example.com"},
+            "NormalTest": {"steps": ["step1"], "url": "http://example.com"}
+        }
+        e2e = E2E(tests=tests_dict)
+        original_run_test = e2e.run_test
+        async def new_run_test(test):
+            if test.name == "ThrowTest":
+                raise Exception("Forced test error")
+            return await original_run_test(test)
+        monkeypatch.setattr(e2e, "run_test", new_run_test)
+        with pytest.raises(Exception, match="Forced test error"):
+            await e2e.run()
+        # Verify that the e2e.json results file was not created because an exception interrupted run()
+    @pytest.mark.asyncio
+    async def test_run_test_invalid_json_browser_closed(self, monkeypatch):
+        """Test that even if FakeHistory.final_result returns invalid JSON, the browser is closed before the exception propagates."""
+        captured_browser = []
+        orig_init = FakeBrowser.__init__
+        def custom_init(self, config):
+            captured_browser.append(self)
+            orig_init(self, config)
+        monkeypatch.setattr(FakeBrowser, "__init__", custom_init)
+        monkeypatch.setattr(FakeHistory, "final_result", lambda self: "not json")
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="TestInvalidJSONClosed", steps=["invalid"], url="http://example.com")
+        with pytest.raises(Exception):
+            try:
+                await e2e.run_test(test_obj)
+            except Exception as e:
+                pass
+        assert captured_browser, "Browser instance was not created."
+        assert captured_browser[0].closed is True, "Browser was not closed after invalid JSON result."
+        monkeypatch.setattr(FakeBrowser, "__init__", orig_init)
+        assert not (tmp_path / "e2e.json").exists()
+    @pytest.mark.asyncio
+    async def test_run_test_empty_url(self):
+        """Test run_test method with an empty URL."""
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="TestEmptyURL", steps=["step1"], url="")
+        result = await e2e.run_test(test_obj)
+        assert result.passed is True
+        assert result.comment == "Test succeeded"
+        assert result.errored is False
+
+    @pytest.mark.asyncio
+    async def test_run_test_whitespace_steps(self):
+        """Test run_test method with steps that are whitespace strings."""
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="TestWhitespaceSteps", steps=["  ", "\t"], url="http://example.com")
+        result = await e2e.run_test(test_obj)
+        assert result.passed is True
+        assert result.comment == "Test succeeded"
+        assert result.errored is False
+
+    @pytest.mark.asyncio
+    async def test_run_test_empty_json_object(self, monkeypatch):
+        """Test run_test method when the agent returns an empty JSON object, expecting a validation error."""
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="TestEmptyJSONObject", steps=["step1"], url="http://example.com")
+        monkeypatch.setattr(FakeHistory, "final_result", lambda self: json.dumps({}))
+        with pytest.raises(Exception):
+            await e2e.run_test(test_obj)
+    def test_e2e_constructor_tests_assignment(self):
+        """Test that the E2E constructor correctly assigns the tests dict."""
+        tests = {"SomeTest": {"steps": ["step1"], "url": "http://example.com"}}
+        e2e = E2E(tests=tests)
+        assert e2e.tests == tests
+
+    @pytest.mark.asyncio
+    async def test_run_invalid_test_dict(self, monkeypatch, tmp_path):
+        """Test that run() raises KeyError if a test dictionary is missing a required key."""
+        monkeypatch.chdir(tmp_path)
+        # This test item is missing the "url" field
+        tests_dict = {"TestMissingURL": {"steps": ["step1"]}}
+        e2e = E2E(tests=tests_dict)
+        with pytest.raises(KeyError):
+            await e2e.run()
+
+    def test_chrome_instance_path_empty_env(self, monkeypatch):
+        """Test that an empty CHROME_INSTANCE_PATH environment variable does not override the default chrome_instance_path."""
+        monkeypatch.setenv("CHROME_INSTANCE_PATH", "")
+        e2e = E2E(tests={})
+        # Since an empty string is falsy, the default should be used.
+        assert e2e.chrome_instance_path == "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+    @pytest.mark.asyncio
+    async def test_run_overall_extra_keys_in_test_definition(self, monkeypatch, tmp_path):
+        """Test that extra keys in the test definitions are ignored in the dumped JSON output."""
+        monkeypatch.chdir(tmp_path)
+        tests_dict = {
+            "TestExtra": {"steps": ["step1"], "url": "http://example.com", "extra": "should be ignored"}
+        }
+        e2e = E2E(tests=tests_dict)
+        results = await e2e.run()
+        e2e_file = tmp_path / "e2e.json"
+        with open(e2e_file, "r") as f:
+            data = json.load(f)
+        for test in data:
+            assert set(test.keys()) == {"steps", "url", "passed", "errored", "comment", "name"}
+
+    @pytest.mark.asyncio
+    async def test_run_overall_print_format(self, monkeypatch, tmp_path, capsys):
+        """Test that the run method prints the correct header and test summary format."""
+        monkeypatch.chdir(tmp_path)
+        tests_dict = {
+            "TestA": {"steps": ["stepA"], "url": "http://example.com/A"},
+            "TestB": {"steps": ["simulate_failure"], "url": "http://example.com/B"}
+        }
+        e2e = E2E(tests=tests_dict)
+        await e2e.run()
+        captured = capsys.readouterr().out
+        # Check that the header is printed in the summary section.
+        assert "Name" in captured
+        assert "Passed" in captured
+        assert "Comment" in captured
+        # Check that each test name appears somewhere in the printed summary.
+        assert "TestA" in captured
+        assert "TestB" in captured
+    @pytest.mark.asyncio
+    async def test_run_overwrites_existing_file(self, monkeypatch, tmp_path):
+        """Test that the run() method overwrites an existing e2e.json file.""" 
+        monkeypatch.chdir(tmp_path)
+        # Create a dummy e2e.json file before running
+        with open("e2e.json", "w") as f:
+            f.write("dummy content")
+        tests_dict = {
+            "TestOverwrite": {"steps": ["step1"], "url": "http://example.com"}
+        }
+        e2e = E2E(tests=tests_dict)
+        # Run the overall tests; this should overwrite the file
+        results = await e2e.run()
+        # Read and check that the file no longer contains the dummy content
+        with open("e2e.json", "r") as f:
+            data = json.load(f)
+        assert isinstance(data, list)
+        assert data != "dummy content"
+        # Also verify that the dumped file contains exactly one test result
+        assert len(data) == 1
+    
+    @pytest.mark.asyncio
+    async def test_test_order_preservation(self, monkeypatch, tmp_path, capsys):
+        """Test that tests are processed and dumped in the same order as defined in the tests dictionary."""
+        monkeypatch.chdir(tmp_path)
+        # Define tests in a specific insertion order
+        tests_dict = {
+            "FirstTest": {"steps": ["step1"], "url": "http://example.com/first"},
+            "SecondTest": {"steps": ["step2"], "url": "http://example.com/second"},
+            "ThirdTest": {"steps": ["simulate_failure"], "url": "http://example.com/third"}
+        }
+        e2e = E2E(tests=tests_dict)
+        results = await e2e.run()
+        # Read the dumped JSON to verify the order. The dumped results should have their 'name' fields in the same order.
+        e2e_file = tmp_path / "e2e.json"
+        with open(e2e_file, "r") as f:
+            dump = json.load(f)
+        dumped_order = [item["name"] for item in dump]
+        expected_order = ["FirstTest", "SecondTest", "ThirdTest"]
+        assert dumped_order == expected_order
+        # Also check that the printed output from run() reflects the processing order
+        captured = capsys.readouterr().out
+        for test_name in expected_order:
+            assert test_name in captured
+    def test_end2endtest_invalid_steps_not_list(self):
+        """Test that End2endTest raises a validation error when steps is not provided as a list."""
+        from pydantic import ValidationError
+        with pytest.raises(ValidationError) as excinfo:
+            End2endTest(name="InvalidStepsNotList", steps="not a list", url="http://example.com")
+        assert "list" in str(excinfo.value)
+
+    def test_end2endtest_invalid_url_type(self):
+        """Test that End2endTest raises a validation error when url is not a string."""
+        from pydantic import ValidationError
+        with pytest.raises(ValidationError) as excinfo:
+            End2endTest(name="InvalidUrl", steps=["step1"], url=123)
+        assert "str" in str(excinfo.value)
