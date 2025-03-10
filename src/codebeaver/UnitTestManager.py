@@ -4,6 +4,7 @@ from .UnitTestGenerator import UnitTestGenerator
 from .UnitTestRunner import UnitTestRunner
 from .TestFilePattern import TestFilePattern
 import logging
+from pathlib import Path
 
 logger = logging.getLogger(__name__)
 
@@ -18,8 +19,11 @@ class UnitTestManager:
     class CouldNotGenerateValidTests(Exception):
         pass
 
-    def __init__(self, file_path: str, single_file_test_commands: list[str], setup_commands: list[str], max_tentatives: int = 4, run_setup: bool = True) -> None:
-        self.file_path = file_path
+    def __init__(self, file_path: str | Path, single_file_test_commands: list[str], setup_commands: list[str], max_tentatives: int = 4, run_setup: bool = True) -> None:
+        if isinstance(file_path, str):
+            self.file_path = Path(file_path)
+        else:
+            self.file_path = file_path
         self.max_tentatives = max_tentatives
         self.run_setup = run_setup
         self.single_file_test_commands = single_file_test_commands

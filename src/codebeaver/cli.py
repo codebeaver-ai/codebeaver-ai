@@ -8,7 +8,9 @@ import os
 import pathlib
 import logging
 
-from codebeaver.UnitTestManager import UnitTestManager
+from .WorkspaceConfig import WorkspaceConfig
+from .TestFilePattern import TestFilePattern
+from .UnitTestManager import UnitTestManager
 from . import __version__
 import yaml
 from .E2E import E2E
@@ -138,6 +140,13 @@ Examples:
         help="Path to the file to analyze",
         dest="file_path"
     )
+    unit_parser.add_argument(
+        "--max-files-to-test",
+        type=int,
+        default=10,
+        help="Maximum number of files to generate unit tests for (default: 10)",
+        dest="max_files_to_test"
+    )
 
     # E2E test command with enhanced help
     e2e_parser = subparsers.add_parser(
@@ -189,10 +198,13 @@ def run_unit_command(args):
     """Run the unit test command (previously 'run')."""
     logger = logging.getLogger('codebeaver')
     
+    workspace_config = None
+
     if not args.template:
         try:
             with open("codebeaver.yml", "r") as f:
                 config = yaml.safe_load(f)
+                workspace_config = WorkspaceConfig.from_yaml(config)
                 if "unit" not in config:
                     logger.error(f"No unit tests defined in {args.yaml_file}")
                     sys.exit(1)
@@ -232,11 +244,25 @@ def run_unit_command(args):
         logger.error("Error: File is empty")
         sys.exit(1)
     if file_path:
-        unit_test_manager = UnitTestManager(args.file_path, single_file_test_commands, setup_commands)
+        unit_test_manager = UnitTestManager(
+            args.file_path, 
+            single_file_test_commands, 
+            setup_commands
+        )
         unit_test_manager.generate_unit_test()
     else:
-        logger.info("Analyzing current project")
-
+        if not workspace_config:
+            logger.error("Error: No workspace config found")
+            sys.exit(1)
+        logger.debug("Analyzing current project")
+        files, test_files = TestFilePattern(pathlib.Path.cwd(), workspace_config).list_files_and_tests()[:args.max_files_to_test]
+        for file in files:
+            unit_test_manager = UnitTestManager(
+                file, 
+                single_file_test_commands, 
+                setup_commands
+            )
+            unit_test_manager.generate_unit_test()
     sys.exit(0)
 
 

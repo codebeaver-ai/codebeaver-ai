@@ -1,12 +1,14 @@
 from pathlib import Path
 import logging
 
+from .WorkspaceConfig import WorkspaceConfig
+
 logger = logging.getLogger(__name__)
 
 
 class TestFilePattern:
 
-    def __init__(self, root_path: Path):
+    def __init__(self, root_path: Path, workspace_config: WorkspaceConfig):
         """
         Initialize TestFilePattern with a root path.
 
@@ -14,6 +16,7 @@ class TestFilePattern:
             root_path: Path object representing the root of the project
         """
         self.root_path = root_path
+        self.workspace_config = workspace_config
 
     def create_new_test_file(self, file_path_str: str) -> Path:
         """
@@ -126,7 +129,7 @@ class TestFilePattern:
 
         return test_file
 
-    def find_test_file(self, file_path: str) -> Path | None:
+    def find_test_file(self, file_path: Path) -> Path | None:
         """
         Find the corresponding test file for a given source file.
 
@@ -161,11 +164,11 @@ class TestFilePattern:
 
         return None
 
-    def _file_test_pattern(self, file_path: str) -> list[str]:
+    def _file_test_pattern(self, file_path: Path) -> list[str]:
         """
         Return the test pattern for a given file path.
         """
-        file_name = Path(file_path).stem
+        file_name = file_path.stem
         clean_name = file_name.lstrip("_")
 
         # Get file extension to determine language
@@ -283,3 +286,23 @@ class TestFilePattern:
                 return matches[0]
 
         return None
+
+    def list_files_and_tests(self) -> tuple[list[Path], list[Path]]:
+        """Returns a tuple of files and tests in the project, sorted by last modified date (newest first)."""
+        all_files = list(self.root_path.rglob("**/*.py")) + list(self.root_path.rglob("**/*.js")) + list(self.root_path.rglob("**/*.ts")) + list(self.root_path.rglob("**/*.jsx")) + list(self.root_path.rglob("**/*.tsx"))
+        if self.workspace_config.ignore:
+            all_files = [file for file in all_files if not any(
+                file.match(pattern) for pattern in self.workspace_config.ignore
+            )]
+        test_files = []
+        for file in all_files:
+            test_file = self.find_test_file(file)
+            if test_file and test_file.exists() and not test_file.is_dir() and not test_file.is_symlink() and not any(test_file.match(pattern) for pattern in (self.workspace_config.ignore or [])):
+                test_files.append(test_file)
+            all_files = [file for file in all_files if file not in test_files]
+        
+        # Sort both lists by modification time (newest first)
+        all_files.sort(key=lambda x: x.stat().st_mtime, reverse=True)
+        test_files.sort(key=lambda x: x.stat().st_mtime, reverse=True)
+        
+        return all_files, test_files
