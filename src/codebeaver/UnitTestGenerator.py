@@ -3,7 +3,7 @@ from .ResponseParser import ResponseParser
 from .ContentCleaner import ContentCleaner
 
 
-class TestGenerator:
+class UnitTestGenerator:
     def __init__(self, file_path: str) -> None:
         self.file_path = file_path
 

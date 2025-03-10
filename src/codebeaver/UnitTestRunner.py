@@ -1,8 +1,10 @@
 import subprocess
 import pathlib
+import logging
 
+logger = logging.getLogger(__name__)
 
-class TestRunner:
+class UnitTestRunner:
     def __init__(
         self, single_file_test_commands: list[str], setup_commands: list[str]
     ) -> None:
@@ -23,6 +25,5 @@ class TestRunner:
         commands.insert(0, f"export TEST_FILE='{test_file_path}'")
         command = " && ".join(commands)
         test_result = subprocess.run(command, shell=True, cwd=pathlib.Path.cwd())
-        print("RUNNING:")
-        print(command)
+        logger.debug(f"UnitTestRunner: {command}")
         return test_result

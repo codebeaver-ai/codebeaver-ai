@@ -1,6 +1,6 @@
 import subprocess
 import pytest
-from codebeaver.TestRunner import TestRunner
+from codebeaver.UnitTestRunner import UnitTestRunner
 
 import pathlib
 class TestTestRunner:
@@ -18,7 +18,7 @@ class TestTestRunner:
 
         monkeypatch.setattr(subprocess, "run", fake_run)
 
-        runner = TestRunner(single_file_test_commands=[], setup_commands=["echo setup1", "echo setup2"])
+        runner = UnitTestRunner(single_file_test_commands=[], setup_commands=["echo setup1", "echo setup2"])
         result = runner.setup()
         assert result.returncode == 0
 
@@ -35,7 +35,7 @@ class TestTestRunner:
 
         monkeypatch.setattr(subprocess, "run", fake_run)
 
-        runner = TestRunner(single_file_test_commands=["echo test", "exit 0"], setup_commands=[])
+        runner = UnitTestRunner(single_file_test_commands=["echo test", "exit 0"], setup_commands=[])
         source_file = "src/main.py"
         test_file = "tests/test_main.py"
         result = runner.run_test(source_file, test_file)
@@ -63,7 +63,7 @@ class TestTestRunner:
 
         monkeypatch.setattr(subprocess, "run", fake_run)
 
-        runner = TestRunner(single_file_test_commands=[], setup_commands=[])
+        runner = UnitTestRunner(single_file_test_commands=[], setup_commands=[])
         source_file = "src/empty.py"
         test_file = "tests/empty_test.py"
         result = runner.run_test(source_file, test_file)
@@ -84,7 +84,7 @@ class TestTestRunner:
             recorded_command.append(command)
             return dummy_result
         monkeypatch.setattr(subprocess, "run", fake_run)
-        runner = TestRunner(single_file_test_commands=[], setup_commands=[])
+        runner = UnitTestRunner(single_file_test_commands=[], setup_commands=[])
         result = runner.setup()
         assert result.returncode == 0
         # Since setup_commands is empty, command should be an empty string.
@@ -98,7 +98,7 @@ class TestTestRunner:
             recorded_command.append(command)
             return dummy_result
         monkeypatch.setattr(subprocess, "run", fake_run)
-        runner = TestRunner(single_file_test_commands=["echo test"], setup_commands=[])
+        runner = UnitTestRunner(single_file_test_commands=["echo test"], setup_commands=[])
         source_file = "src/error.py"
         test_file = "tests/error_test.py"
         result = runner.run_test(source_file, test_file)
@@ -121,7 +121,7 @@ class TestTestRunner:
         monkeypatch.setattr(subprocess, "run", fake_run)
         special_source = "src/special file's test.py"
         special_test = "tests/test file.txt"
-        runner = TestRunner(single_file_test_commands=["echo Special"], setup_commands=[])
+        runner = UnitTestRunner(single_file_test_commands=["echo Special"], setup_commands=[])
         result = runner.run_test(special_source, special_test)
         assert result.returncode == 0
         expected_prefix = f"export TEST_FILE='{special_test}' && export FILE_TO_COVER='{special_source}'"
@@ -138,7 +138,7 @@ class TestTestRunner:
             recorded_command.append(command)
             return dummy_result
         monkeypatch.setattr(subprocess, "run", fake_run)
-        runner = TestRunner(single_file_test_commands=["echo test_empty"], setup_commands=[])
+        runner = UnitTestRunner(single_file_test_commands=["echo test_empty"], setup_commands=[])
         result = runner.run_test("", "")
         assert result.returncode == 0
         expected_prefix = "export TEST_FILE='' && export FILE_TO_COVER=''"
@@ -158,7 +158,7 @@ class TestTestRunner:
             assert cwd == pathlib.Path.cwd()
             return dummy_result
         monkeypatch.setattr(subprocess, "run", fake_run)
-        runner = TestRunner(single_file_test_commands=["echo cwd"], setup_commands=[])
+        runner = UnitTestRunner(single_file_test_commands=["echo cwd"], setup_commands=[])
         result = runner.run_test("src/file.py", "tests/file_test.py")
         assert result.returncode == 0
     def test_setup_does_not_modify_commands(self, monkeypatch):
@@ -170,7 +170,7 @@ class TestTestRunner:
             return dummy_result
 
         monkeypatch.setattr(subprocess, "run", fake_run)
-        runner = TestRunner(single_file_test_commands=[], setup_commands=original_commands.copy())
+        runner = UnitTestRunner(single_file_test_commands=[], setup_commands=original_commands.copy())
         result = runner.setup()
         assert result.returncode == 0
         # Ensure that runner.setup_commands remains unchanged
@@ -187,7 +187,7 @@ class TestTestRunner:
             return dummy_result
 
         monkeypatch.setattr(subprocess, "run", fake_run)
-        runner = TestRunner(single_file_test_commands=original_commands.copy(), setup_commands=[])
+        runner = UnitTestRunner(single_file_test_commands=original_commands.copy(), setup_commands=[])
         result = runner.run_test("src/dummy.py", "tests/dummy_test.py")
         assert result.returncode == 0
         # Ensure that runner.single_file_test_commands remains unchanged after run_test call
