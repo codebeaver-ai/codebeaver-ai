@@ -1,6 +1,4 @@
 import os
-import json
-
 from browser_use import Agent, Controller
 from browser_use.browser.browser import Browser, BrowserConfig
 from dotenv import load_dotenv
