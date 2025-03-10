@@ -52,7 +52,6 @@ Run it! You need to have an OpenAI API key and Chrome installed.
 
 ```bash
 export OPENAI_API_KEY="your-openai-api-key"
-export CHROME_INSTANCE_PATH="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
 codebeaver run
 
 ```
@@ -112,9 +111,36 @@ jobs:
 
 ## CLI Reference
 
+### Commands
+
+- `codebeaver run`: Runs both unit and E2E tests defined in codebeaver.yml
+- `codebeaver unit`: Generates and runs unit tests for a specific file
+- `codebeaver e2e`: Runs end-to-end tests defined in codebeaver.yml
+
+### Command Options
+
+#### Unit Test Command
+
+```bash
+codebeaver unit --file <file_path> [--template <template_name>] [--verbose]
+```
+
+- `--file`: (Required) Path to the file to analyze
+- `--template`: (Optional) Testing framework template to use (e.g., pytest, jest, vitest). If not specified, uses template from codebeaver.yml
+- `-v, --verbose`: (Optional) Enable verbose logging output
+
+#### E2E Test Command
+
+```bash
+codebeaver e2e [--config <config_file>] [--verbose]
+```
+
+- `--config`: (Optional) Path to the YAML configuration file (defaults to codebeaver.yml)
+- `-v, --verbose`: (Optional) Enable verbose logging output
+
 ### Environment Variables
 
-- `OPENAI_API_KEY`: Your OpenAI API key.
+- `OPENAI_API_KEY`: (Required) Your OpenAI API key
 - `CHROME_INSTANCE_PATH`: Path to your Chrome instance. Defaults to `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`
 
 ### Supported Languages and Frameworks

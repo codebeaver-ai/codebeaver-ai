@@ -246,7 +246,6 @@ def run_e2e_command(args):
     logger.debug(f"E2E testing with YAML file: {args.yaml_file}")
     logger.debug("E2E testing functionality is not yet implemented.")
 
-    # Mock implementation - just read and display the YAML file
     try:
         with open(args.yaml_file, "r") as f:
             yaml_content = yaml.safe_load(f)
