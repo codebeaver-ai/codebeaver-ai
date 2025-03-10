@@ -1,0 +1,17 @@
+[run]
+relative_files = True
+source = .
+include =
+    *.py
+omit =
+    */test_*.py
+    */*_test.py
+    */tests/*
+    */testing/*
+    */test/*
+    tests/**
+    **/tests/**
+    .tox/*
+    /usr/*
+[report]
+show_missing = True

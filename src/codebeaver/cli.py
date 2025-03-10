@@ -8,7 +8,7 @@ import os
 import pathlib
 import logging
 
-from .WorkspaceConfig import WorkspaceConfig
+from .CodebeaverConfig import CodeBeaverConfig
 from .TestFilePattern import TestFilePattern
 from .UnitTestManager import UnitTestManager
 from . import __version__
@@ -16,36 +16,6 @@ import yaml
 from .E2E import E2E
 import asyncio
 
-
-def get_template_dir():
-    """Get the template directory path."""
-    import importlib.resources
-
-    # First try the installed package path
-    try:
-        with importlib.resources.path("codebeaver.templates", "") as templates_path:
-            if templates_path.exists():
-                return templates_path
-    except Exception:
-        pass
-
-    # Then try the development path
-    dev_path = pathlib.Path(__file__).parent.parent.parent / "templates"
-    if dev_path.exists():
-        return dev_path
-
-    raise ValueError(
-        "Templates directory not found. Please ensure CodeBeaver is installed correctly."
-    )
-
-
-def get_available_templates():
-    """Get list of available templates from the templates directory."""
-    template_dir = get_template_dir()
-    templates = [f.stem for f in template_dir.glob("*.yml")]
-    if len(templates) == 0:
-        raise ValueError("No templates found in the templates directory")
-    return templates
 
 
 def valid_file_path(path):
@@ -70,6 +40,11 @@ def setup_logging(verbose=False):
     
     # Create logger for our package
     logger = logging.getLogger('codebeaver')
+    # Ensure the logger level is set correctly (in case it inherits a different level)
+    logger.setLevel(log_level)
+    
+    # Test message to verify debug logging
+    logger.debug("Debug logging is enabled")
     return logger
 
 
@@ -109,7 +84,7 @@ Examples:
     subparsers = parser.add_subparsers(dest="command", help="Command to execute")
 
     # Unit test command with enhanced help
-    available_templates = get_available_templates()
+    available_templates = CodeBeaverConfig.get_templates()
     unit_parser = subparsers.add_parser(
         "unit",
         help="Generate and run unit tests for a file",
@@ -143,8 +118,8 @@ Examples:
     unit_parser.add_argument(
         "--max-files-to-test",
         type=int,
-        default=10,
-        help="Maximum number of files to generate unit tests for (default: 10)",
+        default=2,
+        help="Maximum number of files to generate unit tests for (default: 2)",
         dest="max_files_to_test"
     )
 
@@ -189,14 +164,13 @@ Examples:
                 config = yaml.safe_load(f)
                 
             if "unit" in config:
-                logger.info("Running unit tests...")
                 # Create new args for unit command
                 unit_args = argparse.Namespace()
                 unit_args.template = None
                 unit_args.file_path = None
                 unit_args.max_files_to_test = 10
                 unit_args.verbose = args.verbose
-                unit_args.yaml_file = "codebeaver.yml"  # For error messages
+                unit_args.yaml_file = "codebeaver.yml"
                 run_unit_command(unit_args)
             else:
                 logger.info("No unit tests configured in codebeaver.yml, skipping...")
@@ -204,6 +178,8 @@ Examples:
             if "e2e" in config:
                 logger.info("Running e2e tests...")
                 args.command = "e2e"
+                args.yaml_file = "codebeaver.yml"  # Set the yaml_file attribute
+
                 run_e2e_command(args)
             else:
                 logger.info("No e2e tests configured in codebeaver.yml, skipping...")
@@ -236,7 +212,7 @@ def run_unit_command(args):
         try:
             with open("codebeaver.yml", "r") as f:
                 config = yaml.safe_load(f)
-                workspace_config = WorkspaceConfig.from_yaml(config)
+                workspace_config = CodeBeaverConfig.from_yaml(config)
                 if "unit" not in config:
                     logger.error(f"No unit tests defined in {args.yaml_file}")
                     sys.exit(1)
@@ -248,21 +224,13 @@ def run_unit_command(args):
             logger.error(f"Could not find {args.yaml_file}")
             sys.exit(1)
 
-    logger.info(f"Using template: {args.template}")
+    logger.info(f"Running Unit Tests using template: {args.template}")
 
-    # parse the yaml of the template
-    template_path = get_template_dir() / f"{args.template}.yml"
-    try:
-        parsed_file = yaml.safe_load(template_path.open())
-    except FileNotFoundError:
-        logger.error(f"Could not find {args.template} template at {template_path}")
+    if not workspace_config:
+        logger.error("Error: No workspace config found")
         sys.exit(1)
 
-    single_file_test_commands = parsed_file["single_file_test_commands"]
-    setup_commands = parsed_file["setup_commands"]
-    if len(single_file_test_commands) == 0:
-        logger.error("Error: No test commands found in the template")
-        sys.exit(1)
+    logger.debug(f"Workspace config: {workspace_config}")
 
     file_path = args.file_path
     if file_path:
@@ -273,8 +241,7 @@ def run_unit_command(args):
             sys.exit(1)
         unit_test_manager = UnitTestManager(
             args.file_path, 
-            single_file_test_commands, 
-            setup_commands
+            workspace_config
         )
         unit_test_manager.generate_unit_test()
     else:
@@ -283,13 +250,14 @@ def run_unit_command(args):
             sys.exit(1)
         logger.debug("Analyzing current project")
         files, test_files = TestFilePattern(pathlib.Path.cwd(), workspace_config).list_files_and_tests()[:args.max_files_to_test]
-        for file in files:
+        for i, file in enumerate(files):
             unit_test_manager = UnitTestManager(
                 file, 
-                single_file_test_commands, 
-                setup_commands
+                workspace_config
             )
-            unit_test_manager.generate_unit_test()
+            # Only run setup for the first file
+            run_setup = (i == 0)
+            unit_test_manager.generate_unit_test(run_setup=run_setup)
     sys.exit(0)
 
 

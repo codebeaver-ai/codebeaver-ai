@@ -1,14 +1,14 @@
 from pathlib import Path
 import logging
+import fnmatch
+from .CodebeaverConfig import CodeBeaverConfig
 
-from .WorkspaceConfig import WorkspaceConfig
-
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('codebeaver')
 
 
 class TestFilePattern:
 
-    def __init__(self, root_path: Path, workspace_config: WorkspaceConfig):
+    def __init__(self, root_path: Path, workspace_config: CodeBeaverConfig):
         """
         Initialize TestFilePattern with a root path.
 
@@ -18,7 +18,7 @@ class TestFilePattern:
         self.root_path = root_path
         self.workspace_config = workspace_config
 
-    def create_new_test_file(self, file_path_str: str) -> Path:
+    def create_new_test_file(self, file_path: Path) -> Path:
         """
         Create a new test file for a given source file.
 
@@ -32,8 +32,6 @@ class TestFilePattern:
         Returns the absolute path to the new test file.
         """
         test_file = None
-
-        file_path = Path(file_path_str)
         extension = file_path.suffix
 
         # Start from the file's directory and work up
@@ -49,7 +47,7 @@ class TestFilePattern:
             # For each similar file, try to find its test file
             for similar_file in similar_files:
                 relative_similar = similar_file.relative_to(root_dir)
-                test_patterns = self._file_test_pattern(str(relative_similar))
+                test_patterns = self._file_test_pattern(relative_similar)
 
                 # Check each test pattern
                 for pattern in test_patterns:
@@ -77,7 +75,7 @@ class TestFilePattern:
 
         if test_file is None:
             # fallback to standard convention
-            test_file = self._standard_convention_for_new_test_file(file_path_str)
+            test_file = self._standard_convention_for_new_test_file(file_path)
         absolute_test_file = Path(self.root_path / test_file)
         # create the parent directory if it doesn't exist
         if not absolute_test_file.parent.exists():
@@ -88,8 +86,7 @@ class TestFilePattern:
         logger.warning(f"Creating new test file: {absolute_test_file}")
         return absolute_test_file
 
-    def _standard_convention_for_new_test_file(self, file_path_str: str) -> Path:
-        file_path = Path(file_path_str)
+    def _standard_convention_for_new_test_file(self, file_path: Path) -> Path:
         file_name = file_path.stem
         extension = file_path.suffix
 
@@ -289,20 +286,74 @@ class TestFilePattern:
 
     def list_files_and_tests(self) -> tuple[list[Path], list[Path]]:
         """Returns a tuple of files and tests in the project, sorted by last modified date (newest first)."""
+        logger.debug(f"Listing files and tests in {self.root_path}")
         all_files = list(self.root_path.rglob("**/*.py")) + list(self.root_path.rglob("**/*.js")) + list(self.root_path.rglob("**/*.ts")) + list(self.root_path.rglob("**/*.jsx")) + list(self.root_path.rglob("**/*.tsx"))
-        if self.workspace_config.ignore:
-            all_files = [file for file in all_files if not any(
-                file.match(pattern) for pattern in self.workspace_config.ignore
-            )]
-        test_files = []
-        for file in all_files:
-            test_file = self.find_test_file(file)
-            if test_file and test_file.exists() and not test_file.is_dir() and not test_file.is_symlink() and not any(test_file.match(pattern) for pattern in (self.workspace_config.ignore or [])):
-                test_files.append(test_file)
-            all_files = [file for file in all_files if file not in test_files]
+        ignore = self.workspace_config.ignore or []
+        if self.workspace_config.unit:
+            ignore.extend(self.workspace_config.unit.ignore or [])
         
+        # Read patterns from .gitignore if it exists
+        gitignore_path = self.root_path / ".gitignore"
+        if gitignore_path.exists():
+            with open(gitignore_path, 'r') as f:
+                for line in f:
+                    line = line.strip()
+                    # Skip empty lines and comments
+                    if line and not line.startswith('#'):
+                        # Convert .gitignore pattern to fnmatch pattern
+                        if not line.startswith('*'):
+                            line = f"*{line}*"
+                        ignore.append(line)
+        
+        # Add default ignore patterns as fallback
+        default_ignores = ["*node_modules*", "*__pycache__*", "*dist*", "*build*", "*coverage*", 
+                          "*.log*", "*.tmp*", "*.temp*", "*.tmp.*", "*.temp.*", 
+                          "*.tmp.*.*", "*.temp.*.*", "*.spec.*", "*.test.*", "*_test*.py"]
+        for pattern in default_ignores:
+            if pattern not in ignore:
+                ignore.append(pattern)
+                
+        logger.debug(f"Ignoring {ignore}")
+
+        def should_ignore(file_path, patterns):
+            """Check if a file path matches any of the ignore patterns."""
+            # Convert path to string for easier pattern matching
+            path_str = str(file_path.relative_to(self.root_path))
+            for pattern in patterns:
+                # Convert glob pattern to regex pattern
+                if fnmatch.fnmatch(path_str, pattern):
+                    return True
+            return False
+            
+        all_files = [file for file in all_files if not should_ignore(file, ignore)]
+        test_files = []
+        source_files = []
+        logger.debug(f"All files: {str(len(all_files))}")
+        
+        # First, identify test files by checking if the file matches test patterns
+        for file in all_files:
+            relative_path = file.relative_to(self.root_path)
+            file_name = file.name
+            
+            # Check if the file is a test file based on common test file patterns
+            is_test_file = (
+                file_name.startswith("test_") or 
+                file_name.endswith("_test.py") or
+                ".test." in file_name or 
+                ".spec." in file_name or
+                (file.parent.name == "__tests__") or
+                (file.parent.name == "tests" and file_name.startswith("test_")) or
+                (file.parent.name == "test" and file_name.startswith("test_"))
+            )
+            
+            if is_test_file:
+                test_files.append(file)
+            else:
+                source_files.append(file)
+                
+        logger.debug(f"Found {len(source_files)} files and {len(test_files)} tests")
         # Sort both lists by modification time (newest first)
-        all_files.sort(key=lambda x: x.stat().st_mtime, reverse=True)
+        source_files.sort(key=lambda x: x.stat().st_mtime, reverse=True)
         test_files.sort(key=lambda x: x.stat().st_mtime, reverse=True)
         
-        return all_files, test_files
+        return source_files, test_files

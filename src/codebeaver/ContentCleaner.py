@@ -5,12 +5,11 @@ from typing import Literal
 import black
 import tree_sitter_typescript as tstypescript
 from tree_sitter import Language, Node, Parser, Tree
-from pygments.lexers import guess_lexer, get_lexer_by_name
-from pygments.lexers import ClassNotFound
+from pygments.lexers import guess_lexer
 
 import logging
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('codebeaver')
 
 
 class ContentCleaner:

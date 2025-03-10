@@ -12,7 +12,11 @@ from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel
 
+import logging
+
 load_dotenv()
+
+logger = logging.getLogger('codebeaver')
 
 
 class End2endTest(BaseModel):

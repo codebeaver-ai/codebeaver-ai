@@ -1,19 +1,23 @@
 import openai
 from .ResponseParser import ResponseParser
 from .ContentCleaner import ContentCleaner
+from pathlib import Path
+import logging
+
+logger = logging.getLogger('codebeaver')
 
 
 class UnitTestGenerator:
-    def __init__(self, file_path: str) -> None:
+    def __init__(self, file_path: Path) -> None:
         self.file_path = file_path
 
-    def generate_test(self, test_file: str | None = None, console: str = ""):
+    def generate_test(self, test_file_path: Path | None = None, console: str = ""):
         """
         Generate a test for the given file.
         """
         source_content = open(self.file_path).read()
-        if test_file:
-            test_file_content = open(test_file).read()
+        if test_file_path:
+            test_file_content = open(test_file_path).read()
         else:
             test_file_content = None
         prompt = f"""
@@ -25,10 +29,10 @@ Source code:
 {source_content}
 ```
 """
-        if test_file:
+        if test_file_path:
             prompt += f"""
 Test file path:
-`{test_file}`
+`{test_file_path}`
 
 """
         if test_file_content:
@@ -60,18 +64,21 @@ Last console output:
 
     Add a docstring to the test to explain what the test is doing.
     """
-        # print("PROMPT:", prompt)
+        logger.debug("PROMPT:")
+        logger.debug(prompt)
         response = openai.chat.completions.create(
             model="o3-mini",
             messages=[{"role": "user", "content": prompt}],
             max_completion_tokens=100000,
         )
-        # print("RESPONSE:", response.choices[0].message.content)
+        logger.debug("RESPONSE:")
+        logger.debug(response)
 
         test_content = ResponseParser.parse(response.choices[0].message.content)
+        logger.debug(f"Test content: {test_content}")
 
         test_content = ContentCleaner.merge_files(
-            self.file_path, test_content, test_file_content
+            str(self.file_path), test_content, test_file_content
         )
         if not test_content:
             raise ValueError("Error: No test content found")
