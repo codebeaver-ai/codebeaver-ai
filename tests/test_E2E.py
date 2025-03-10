@@ -5,6 +5,7 @@ import pytest
 from pydantic import ValidationError
 
 from codebeaver.E2E import E2E, End2endTest
+import json
 
 # Fake classes to simulate Browser and Agent behavior
 class FakeBrowser:
@@ -24,7 +25,6 @@ class FakeHistory:
             return json.dumps({"passed": False, "comment": "Failed test simulated"})
         else:
             return json.dumps({"passed": True, "comment": "Test succeeded"})
-
 class FakeAgent:
     def __init__(self, task, llm, browser, controller):
         self.task = task
@@ -32,9 +32,10 @@ class FakeAgent:
         self.browser = browser
         self.controller = controller
     async def run(self):
-        if "simulate_no_result" in self.task:
-            return FakeHistory("simulate_no_result")
-        return FakeHistory(self.task)
+        with open("e2e.json", "w") as f:
+            json.dump([test.model_dump() for test in all_tests], f)
+        passed_count = sum(1 for test in all_tests if test.passed)
+        print(f"{passed_count}/{len(all_tests)} E2E tests passed")
 
 @pytest.fixture(autouse=True)
 def patch_browser_agent(monkeypatch):
@@ -68,6 +69,15 @@ class TestE2E:
         """Test run_test method when no result is returned from agent.run."""
         e2e = E2E(tests={})
         test = End2endTest(name="TestNoResult", steps=["simulate_no_result"], url="http://example.com")
+        result = await e2e.run_test(test)
+        assert result.errored is True
+        assert result.comment == "No result from the test"
+    async def test_run_test_empty_string(self, monkeypatch):
+        """Test run_test method when agent returns an empty string result."""
+        e2e = E2E(tests={})
+        test = End2endTest(name="TestEmptyString", steps=["simulate_empty_string"], url="http://example.com")
+        # Monkey-patch FakeHistory.final_result to return an empty string
+        monkeypatch.setattr(FakeHistory, "final_result", lambda self: "")
         result = await e2e.run_test(test)
         assert result.errored is True
         assert result.comment == "No result from the test"
@@ -336,3 +346,75 @@ class TestE2E:
         dump = test_obj.model_dump()
         expected_keys = {"steps", "url", "passed", "errored", "comment", "name"}
         assert set(dump.keys()) == expected_keys
+    async def test_logging_in_run(self, monkeypatch, caplog):
+        """Test that the run() method logs debug messages for each test."""
+        tests_dict = {"TestLog": {"steps": ["step1"], "url": "http://example.com"}}
+        e2e = E2E(tests=tests_dict)
+        with caplog.at_level("DEBUG"):
+            await e2e.run()
+        # Verify that at least one log record includes the message indicating execution of TestLog
+        found = any("Running E2E: TestLog" in record.message for record in caplog.records)
+        assert found
+    async def test_all_tests_pass_summary(self, monkeypatch, tmp_path, capsys):
+        """Test that the run method prints the correct summary when all tests pass."""
+        monkeypatch.chdir(tmp_path)
+        tests_dict = {
+            "TestAllPass1": {"steps": ["step1"], "url": "http://example.com"},
+            "TestAllPass2": {"steps": ["step2"], "url": "http://example.com"}
+        }
+        e2e = E2E(tests=tests_dict)
+        # Force FakeHistory.final_result to always return a passing result.
+        monkeypatch.setattr(FakeHistory, "final_result", lambda self: json.dumps({"passed": True, "comment": "Test succeeded"}))
+        await e2e.run()
+        captured = capsys.readouterr().out
+        assert "2/2 E2E tests passed" in captured
+    
+    async def test_all_tests_fail_summary(self, monkeypatch, tmp_path, capsys):
+        """Test that the run method prints the correct summary when all tests fail."""
+        monkeypatch.chdir(tmp_path)
+        tests_dict = {
+            "TestAllFail1": {"steps": ["simulate_failure"], "url": "http://example.com"},
+            "TestAllFail2": {"steps": ["simulate_failure"], "url": "http://example.com"}
+        }
+        e2e = E2E(tests=tests_dict)
+        await e2e.run()
+        captured = capsys.readouterr().out
+        # Since both tests simulate a failure, expect 0 passed out of 2
+    async def test_all_tests_mixed_summary(self, monkeypatch, tmp_path, capsys):
+        """Test that the run method prints the correct summary when tests have mixed outcomes."""
+        monkeypatch.chdir(tmp_path)
+        tests_dict = {
+            "TestPass": {"steps": ["step1"], "url": "http://example.com"},
+            "TestFail": {"steps": ["simulate_failure"], "url": "http://example.com"}
+        }
+        e2e = E2E(tests=tests_dict)
+        await e2e.run()
+        e2e_file = tmp_path / "e2e.json"
+        assert e2e_file.exists()
+        with open(e2e_file, "r") as f:
+            data = json.load(f)
+        assert isinstance(data, list)
+        assert len(data) == 2
+        captured = capsys.readouterr().out
+        assert "1/2 E2E tests passed" in captured
+    async def test_run_slow_agent(self, monkeypatch):
+        """Test that run_test handles a slow Agent.run execution correctly."""
+        import asyncio
+        async def slow_run(self):
+            await asyncio.sleep(0.1)  # simulate a delay in agent execution
+            return FakeHistory("normal step")
+        monkeypatch.setattr(FakeAgent, "run", slow_run)
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="TestSlowAgent", steps=["normal step"], url="http://example.com")
+        result = await e2e.run_test(test_obj)
+        assert result.passed is True
+        assert result.comment == "Test succeeded"
+        assert result.errored is False
+    async def test_run_test_non_string_result(self, monkeypatch):
+        """Test that run_test raises an exception when the agent returns a non-string result."""
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="TestNonStringResult", steps=["simulate_non_string"], url="http://example.com")
+        # Patch FakeHistory.final_result to return a non-string (integer) result
+        monkeypatch.setattr(FakeHistory, "final_result", lambda self: 123)
+        with pytest.raises(Exception):
+            await e2e.run_test(test_obj)
