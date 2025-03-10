@@ -19,7 +19,6 @@ from .E2E import E2E
 import asyncio
 
 
-
 def valid_file_path(path):
     """Validate if the given path exists and is a file."""
     file_path = pathlib.Path(path)
@@ -31,20 +30,16 @@ def valid_file_path(path):
 def setup_logging(verbose=False):
     """Configure logging for the application."""
     log_level = logging.DEBUG if verbose else logging.INFO
-    log_format = '%(levelname)s: %(message)s'
-    
+    log_format = "%(levelname)s: %(message)s"
+
     # Configure root logger
-    logging.basicConfig(
-        level=log_level,
-        format=log_format,
-        stream=sys.stderr
-    )
-    
+    logging.basicConfig(level=log_level, format=log_format, stream=sys.stderr)
+
     # Create logger for our package
-    logger = logging.getLogger('codebeaver')
+    logger = logging.getLogger("codebeaver")
     # Ensure the logger level is set correctly (in case it inherits a different level)
     logger.setLevel(log_level)
-    
+
     # Test message to verify debug logging
     logger.debug("Debug logging is enabled")
     return logger
@@ -77,9 +72,7 @@ Examples:
 
     # Add verbose flag
     parser.add_argument(
-        '-v', '--verbose',
-        action='store_true',
-        help='Enable verbose logging output'
+        "-v", "--verbose", action="store_true", help="Enable verbose logging output"
     )
 
     # Create subparsers for different commands
@@ -115,14 +108,14 @@ Examples:
         type=valid_file_path,
         required=False,
         help="Path to the file to analyze",
-        dest="file_path"
+        dest="file_path",
     )
     unit_parser.add_argument(
         "--max-files-to-test",
         type=int,
         default=2,
         help="Maximum number of files to generate unit tests for (default: 2)",
-        dest="max_files_to_test"
+        dest="max_files_to_test",
     )
 
     # E2E test command with enhanced help
@@ -146,7 +139,7 @@ Examples:
         type=valid_file_path,
         default="codebeaver.yml",
         help="Path to the YAML configuration file (defaults to codebeaver.yml)",
-        dest="yaml_file"  # Keep the same variable name for compatibility
+        dest="yaml_file",  # Keep the same variable name for compatibility
     )
 
     args = parser.parse_args(args)
@@ -164,7 +157,7 @@ Examples:
         try:
             with open("codebeaver.yml", "r") as f:
                 config = yaml.safe_load(f)
-                
+
             if "unit" in config:
                 # Create new args for unit command
                 unit_args = argparse.Namespace()
@@ -176,7 +169,7 @@ Examples:
                 run_unit_command(unit_args)
             else:
                 logger.info("No unit tests configured in codebeaver.yml, skipping...")
-                
+
             if "e2e" in config:
                 logger.info("Running e2e tests...")
                 args.command = "e2e"
@@ -185,11 +178,11 @@ Examples:
                 run_e2e_command(args)
             else:
                 logger.info("No e2e tests configured in codebeaver.yml, skipping...")
-                
+
             if "unit" not in config and "e2e" not in config:
                 logger.error("No tests configured in codebeaver.yml")
                 sys.exit(1)
-                
+
         except FileNotFoundError:
             logger.error("Could not find codebeaver.yml")
             sys.exit(1)
@@ -206,8 +199,8 @@ Examples:
 
 def run_unit_command(args):
     """Run the unit test command"""
-    logger = logging.getLogger('codebeaver')
-    
+    logger = logging.getLogger("codebeaver")
+
     workspace_config = None
 
     if not args.template:
@@ -216,7 +209,9 @@ def run_unit_command(args):
                 config = yaml.safe_load(f)
                 workspace_config = CodeBeaverConfig.from_yaml(config)
                 if "unit" not in config:
-                    logger.info("No Unit Test defintion in codebeaver.yml. Check the README at https://github.com/codebeaver-ai/codebeaver-ai for more information.")
+                    logger.info(
+                        "No Unit Test defintion in codebeaver.yml. Check the README at https://github.com/codebeaver-ai/codebeaver-ai for more information."
+                    )
                     sys.exit(2)
                 if "from" not in config["unit"]:
                     logger.error("No template specified in codebeaver.yml")
@@ -241,37 +236,38 @@ def run_unit_command(args):
         if not file_content or file_content == "":
             logger.error("Error: File is empty")
             sys.exit(1)
-        unit_test_manager = UnitTestManager(
-            args.file_path, 
-            workspace_config
-        )
+        unit_test_manager = UnitTestManager(args.file_path, workspace_config)
         unit_test_manager.generate_unit_test()
     else:
         if not workspace_config:
             logger.error("Error: No workspace config found")
             sys.exit(1)
         logger.debug("Analyzing current project")
-        files, test_files = TestFilePattern(pathlib.Path.cwd(), workspace_config).list_files_and_tests()
+        files, test_files = TestFilePattern(
+            pathlib.Path.cwd(), workspace_config
+        ).list_files_and_tests()
         if len(files) > args.max_files_to_test:
-            logger.info(f"Found {len(files)} files to write tests for. Writing tests for the first {args.max_files_to_test} files.")
-            files = files[:args.max_files_to_test]
+            logger.info(
+                f"Found {len(files)} files to write Unit Tests for. Writing tests for the first {args.max_files_to_test} files."
+            )
+            files = files[: args.max_files_to_test]
         else:
-            logger.info(f"Found {len(files)} files to write tests for.")
+            logger.info(f"Found {len(files)} files to write Unit Tests for.")
 
         for i, file in enumerate(files):
-            unit_test_manager = UnitTestManager(
-                file, 
-                workspace_config
-            )
+            unit_test_manager = UnitTestManager(file, workspace_config)
             # Only run setup for the first file
-            run_setup = (i == 0)
-            unit_test_manager.generate_unit_test(run_setup=run_setup)
+            run_setup = i == 0
+            try:
+                unit_test_manager.generate_unit_test(run_setup=run_setup)
+            except UnitTestManager.FoundBug as e:
+                logger.warning(e)
     sys.exit(0)
 
 
 def run_e2e_command(args):
     """Run the e2e test command (mocked for now)."""
-    logger = logging.getLogger('codebeaver')
+    logger = logging.getLogger("codebeaver")
     logger.debug(f"E2E testing with YAML file: {args.yaml_file}")
 
     try:
