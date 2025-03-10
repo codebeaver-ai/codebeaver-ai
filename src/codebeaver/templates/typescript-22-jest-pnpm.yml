@@ -1,0 +1,49 @@
+main_service: node
+services:
+  node:
+    image: node:22.13.1-slim
+test_commands:
+  - "pnpm exec jest --coverage --coverageReporters=json --json --outputFile=jest-results.json --collectCoverageFrom='**/*.{js,jsx,ts,tsx}' --passWithNoTests || [ $? -eq 1 -o $? -eq 5 ]"
+  - "if [ -f 'coverage/coverage-final.json' ]; then mv coverage/coverage-final.json coverage.json; else echo 'Warn: coverage/coverage-final.json not found'; exit 1; fi"
+single_file_test_commands:
+  - "pnpm exec jest --coverage --coverageReporters=json --json --outputFile=jest-results.json --testPathPattern=$TEST_FILE --collectCoverageFrom=$FILE_TO_COVER --passWithNoTests || [ $? -eq 1 -o $? -eq 5 ]"
+  - "if [ -f 'coverage/coverage-final.json' ]; then mv coverage/coverage-final.json coverage.json; else echo 'Warn: coverage/coverage-final.json not found'; exit 1; fi"
+setup_commands:
+  - apt-get update -qqy || true
+  - apt-get install -qqy git || true
+  - npm install -g pnpm
+  - pnpm install || true
+  - pnpm add -D --silent typescript || true
+  - pnpm add -D --silent @types/jest || true
+  - pnpm add -D --silent ts-jest || true
+  - pnpm add -D --silent jest || true
+  - pnpm add -D --silent ts-node || true
+  - pnpm add -D --silent jest-json-reporter || true
+  - pnpm add -D --silent babel || true
+  - pnpm install --save-dev babel-jest || true
+  - pnpm add -D --silent @babel/core || true
+  - pnpm add -D --silent @babel/preset-typescript || true
+  - pnpm add -D --silent @babel/preset-react || true
+  - pnpm add -D --silent @babel/preset-env || true
+  - pnpm add -D --silent @testing-library/react || true
+  - pnpm add -D --silent @testing-library/dom || true
+  - pnpm add -D --silent @testing-library/jest-dom || true
+  - pnpm add -D --silent @testing-library/user-event || true
+  - pnpm add -D --silent jest-environment-jsdom || true
+  - '[ -f tsconfig.json ] || echo ''{"compilerOptions":{"target":"es5","module":"commonjs","strict":true,"esModuleInterop":true,"skipLibCheck":true,"forceConsistentCasingInFileNames":true,"jsx":"react-jsx","types":["jest","node"]}}'' > tsconfig.json'
+  - '[ -f babel.config.js ] || echo ''module.exports={presets:[["@babel/preset-env",{targets:{node:"current"}}],"@babel/preset-typescript",["@babel/preset-react",{runtime:"automatic"}]]}'' > babel.config.js'
+  - 'if [ ! -f jest.config.js ] && grep -q "\"next\"" package.json; then pnpm install --save-dev identity-obj-proxy && echo "const config = {testEnvironment:\"jsdom\",setupFilesAfterEnv:[\"@testing-library/jest-dom\"],transform:{\"^.+\\\\.(ts|tsx)$\":\"babel-jest\",\"^.+\\\\.(js|jsx)$\":\"babel-jest\"},moduleNameMapper:{\"\\\\.(css|less|scss|sass)$\":\"identity-obj-proxy\",\"^next/image$\":\"<rootDir>/__mocks__/nextImageMock.js\"},moduleDirectories:[\"node_modules\",\"<rootDir>/\"]}; export default config; typeof module !== \"undefined\" && (module.exports = config);" > jest.config.js; elif [ ! -f jest.config.js ]; then echo "const config = {testEnvironment:\"jsdom\",setupFilesAfterEnv:[\"@testing-library/jest-dom\"],transform:{\"^.+\\\\.(ts|tsx)$\":\"babel-jest\",\"^.+\\\\.(js|jsx)$\":\"babel-jest\"},moduleDirectories:[\"node_modules\",\"<rootDir>/\"]}; export default config; typeof module !== \"undefined\" && (module.exports = config);" > jest.config.js; fi'
+ignore:
+  - "*prettierrc*"
+  - "*eslintrc*"
+  - "*stylelintrc*"
+  - "*commitlintrc*"
+  - "*lintstagedrc*"
+  - "*huskyrc*"
+  - "*config.test.*"
+  - "*.config.js"
+  - "*.config.ts"
+  - "*.config.jsx"
+  - "*.d.ts"
+  - "*/config.*"
+  - "config.*"

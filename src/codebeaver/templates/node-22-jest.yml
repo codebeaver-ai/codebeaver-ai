@@ -1,0 +1,37 @@
+main_service: node
+services:
+  node:
+    image: node:22.13.1-slim
+test_commands:
+  - "npx jest --coverage --coverageReporters=json --json --outputFile=jest-results.json --collectCoverageFrom='**/*.{js,jsx,ts,tsx}' --coveragePathIgnorePatterns='node_modules' --passWithNoTests || [ $? -eq 1 -o $? -eq 5 ]"
+  - "if [ -f 'coverage/coverage-final.json' ]; then mv coverage/coverage-final.json coverage.json; else echo 'Warn: coverage/coverage-final.json not found'; exit 1; fi"
+single_file_test_commands:
+  - "npx jest --coverage --coverageReporters=json --json --outputFile=jest-results.json --testPathPattern=$TEST_FILE --collectCoverageFrom=$FILE_TO_COVER --passWithNoTests || [ $? -eq 1 -o $? -eq 5 ]"
+  - "if [ -f 'coverage/coverage-final.json' ]; then mv coverage/coverage-final.json coverage.json; else echo 'Warn: coverage/coverage-final.json not found'; exit 1; fi"
+setup_commands:
+  - apt-get update -qqy || true
+  - apt-get install -qqy git || true
+  - npm install -q --legacy-peer-deps || true
+  - npm list jest >/dev/null 2>&1 || (command -v jest >/dev/null 2>&1 || npm install -q jest)
+  - npm list ts-node >/dev/null 2>&1 || (command -v ts-node >/dev/null 2>&1 || npm install -q ts-node)
+  - npm list jest-json-reporter >/dev/null 2>&1 || (command -v jest-json-reporter >/dev/null 2>&1 || npm install -q jest-json-reporter)
+  - npm list -g @testing-library/react >/dev/null 2>&1 || npm install -q --global @testing-library/react
+  - npm list -g @testing-library/dom >/dev/null 2>&1 || npm install -q --global @testing-library/dom
+  - npm list -g @testing-library/jest-dom >/dev/null 2>&1 || npm install -q --global @testing-library/jest-dom
+  - npm list -g @testing-library/user-event >/dev/null 2>&1 || npm install -q --global @testing-library/user-event
+  - npm list -g @testing-library/jest-dom >/dev/null 2>&1 || npm install -q --global @testing-library/jest-dom
+  - npm list -g @testing-library/user-event >/dev/null 2>&1 || npm install -q --global @testing-library/user-event
+  - npm list jest-environment-jsdom >/dev/null 2>&1 || npm install --save-dev jest-environment-jsdom || true
+ignore:
+  - "*prettierrc*"
+  - "*eslintrc*"
+  - "*stylelintrc*"
+  - "*commitlintrc*"
+  - "*lintstagedrc*"
+  - "*huskyrc*"
+  - "*config.test.*"
+  - "*.config.js"
+  - "*.config.ts"
+  - "*.config.jsx"
+  - "*/config.*"
+  - "config.*"

@@ -1,0 +1,48 @@
+main_service: node
+services:
+  node:
+    image: node:22.13.1-slim
+test_commands:
+  - "npx jest --coverage --coverageReporters=json --json --outputFile=jest-results.json --collectCoverageFrom='**/*.{js,jsx,ts,tsx}' --coveragePathIgnorePatterns='node_modules' --passWithNoTests || [ $? -eq 1 -o $? -eq 5 ]"
+  - "if [ -f 'coverage/coverage-final.json' ]; then mv coverage/coverage-final.json coverage.json; else echo 'Warn: coverage/coverage-final.json not found'; exit 1; fi"
+single_file_test_commands:
+  - "npx jest --coverage --coverageReporters=json --json --outputFile=jest-results.json --testPathPattern=$TEST_FILE --collectCoverageFrom=$FILE_TO_COVER --passWithNoTests || [ $? -eq 1 -o $? -eq 5 ]"
+  - "if [ -f 'coverage/coverage-final.json' ]; then mv coverage/coverage-final.json coverage.json; else echo 'Warn: coverage/coverage-final.json not found'; exit 1; fi"
+setup_commands:
+  - apt-get update -qqy || true
+  - apt-get install -qqy git || true
+  - npm install --legacy-peer-deps
+  - npm install --save-dev typescript || true
+  - npm install --save-dev @types/jest || true
+  - npm install --save-dev ts-jest || true
+  - npm install --save-dev jest || true
+  - npm install --save-dev ts-node || true
+  - npm install --save-dev jest-json-reporter || true
+  - npm install --save-dev babel || true
+  - npm install --save-dev babel-jest || true
+  - npm install --save-dev @babel/core || true
+  - npm install --save-dev @babel/preset-typescript || true
+  - npm install --save-dev @babel/preset-react || true
+  - npm install --save-dev @babel/preset-env || true
+  - npm install --save-dev @testing-library/react || true
+  - npm install --save-dev @testing-library/dom || true
+  - npm install --save-dev @testing-library/jest-dom || true
+  - npm install --save-dev @testing-library/user-event || true
+  - npm install --save-dev jest-environment-jsdom || true
+  - '[ -f tsconfig.json ] || echo ''{"compilerOptions":{"target":"es5","module":"commonjs","strict":true,"esModuleInterop":true,"skipLibCheck":true,"forceConsistentCasingInFileNames":true,"jsx":"react-jsx","types":["jest","node"]}}'' > tsconfig.json'
+  - '[ -f babel.config.js ] || echo ''module.exports={presets:[["@babel/preset-env",{targets:{node:"current"}}],"@babel/preset-typescript",["@babel/preset-react",{runtime:"automatic"}]]}'' > babel.config.js'
+  - '[ -f jest.config.js ] || echo ''module.exports={testEnvironment:"jsdom",setupFilesAfterEnv:["@testing-library/jest-dom"],transform:{"^.+\\.(ts|tsx)$":"ts-jest","^.+\\.(js|jsx)$":"babel-jest"}}'' > jest.config.js'
+ignore:
+  - "*prettierrc*"
+  - "*eslintrc*"
+  - "*stylelintrc*"
+  - "*commitlintrc*"
+  - "*lintstagedrc*"
+  - "*huskyrc*"
+  - "*config.test.*"
+  - "*.config.js"
+  - "*.config.ts"
+  - "*.config.jsx"
+  - "*.d.ts"
+  - "*/config.*"
+  - "config.*"

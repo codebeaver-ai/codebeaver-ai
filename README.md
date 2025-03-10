@@ -5,47 +5,168 @@
   <img src="https://www.codebeaver.ai/logo_complete_color.png" alt="logo" width="330">
 
 </picture>
-<h1 align="center">Unit Tests on Autopilot</h1>
+<h1 align="center">Testing on Autopilot</h1>
 </div>
 <br/><br/>
 
-[![GitHub license](https://img.shields.io/badge/License-MIT-orange.svg)](https://github.com/codebeaver-ai/codebeaver-ai/blob/main/LICENSE)
+[![GitHub license](https://img.shields.io/badge/License-AGPL_3.0-blue.svg)](https://github.com/codebeaver-ai/codebeaver-ai/blob/main/LICENSE)
 [![Discord](https://badgen.net/badge/icon/discord?icon=discord&label&color=purple)](https://discord.gg/4QMwWdsMGt)
 <a href="https://github.com/codebeaver-ai/codebeaver-ai/commits/main">
 <img alt="GitHub" src="https://img.shields.io/github/last-commit/codebeaver-ai/codebeaver-ai/main?style=for-the-badge" height="20">
 </a><br>
 
-**CodeBeaver** supercharges your development workflow by:
+CodeBeaver is an open-source testing automation tool that leverages AI to simplify the testing process. It helps developers:
 
-- Running tests automatically on every PR
-- Pinpointing exactly where bugs are hiding in your code
-- Writing new tests when you need them
-- Keeping your test suite up-to-date as your code evolves
-- Adding edge cases you might have missed
+- 🤖 **Run end-to-end tests** using natural language descriptions
+- 🧪 **Generate and maintain unit tests** automatically for your codebase
+- 🐛 **Detect potential bugs** and provide detailed fix explanations
+- ⚡ **Reduce testing overhead** while improving code quality
 
-## See it in action
+Currently supporting Python and TypeScript, with more languages coming soon.
 
-Want to see the magic? Check out these real examples from our Pull Requests:
+## Quickstart
+
+Install the package
+
+```bash
+pip install codebeaver
+```
+
+Add a yaml file to your project called `codebeaver.yaml`. This tells CodeBeaver what to test and how.
+
+```yaml
+e2e:
+  login-test: # Name of the test. You can add more
+    url: "localhost:3000" # Starting URL of your app. It can be a local server or a remote server
+    steps:
+      - Login with Github
+      - Go to the team page
+      - Change the team name to "e2e"
+      - Click on the "Save" button
+      - Check that the team name is "e2e" # use words like "Check that" to assert the results of the test
+unit:
+  from: pytest # The Unit testing framework you want to use
+```
+
+Run it! You need to have an OpenAI API key and Chrome installed.
+
+```bash
+export OPENAI_API_KEY="your-openai-api-key"
+codebeaver
+
+```
+
+You will get a summary report like the following:
+
+```bash
+
+🖥️ 1/1 E2E tests
+
+login-test: Success!
+
+🧪 14/15 Unit tests
+
+🔄 1 test added and 1 test updated to reflect recent changes.
+🐛 Found 1 bug
+```
+
+## GitHub Actions
+
+CodeBeaver can be used in a GitHub Action to run unit tests on every commit and E2E tests after you release a new version.
+
+```yaml
+name: Run CodeBeaver
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  unit-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: codebeaver-ai/codebeaver-os-action@0.1.0
+        with:
+          action-type: "unit"
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+  after-deployment: # In this example, this step runs after a new release is deployed
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: codebeaver-ai/codebeaver-os-action@v0.1.0
+        with:
+          action-type: "e2e"
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          STARTING_URL: "http://yourstaging.yourwebsite.com"
+```
+
+## Examples
 
 - [CodeBeaver discovers a bug and explains where the problem is](https://github.com/codebeaver-ai/codebeaver-ai/pull/8)
 - [CodeBeaver updates a test given the new code commited](https://github.com/codebeaver-ai/codebeaver-ai/pull/12)
 
-## Try it yourself
+## CLI Reference
 
-Got a project in mind? Let's see CodeBeaver in action with your code:
+### Commands
 
-1. Fork this repo (main branch is fine)
-2. Create a new branch
-3. Drop in your code
-4. Open a PR
-5. Watch CodeBeaver do its thing
-6. Check out the results!
+- `codebeaver`: Without any command, runs both unit and E2E tests if defined in codebeaver.yml
+- `codebeaver unit`: Generates and runs unit tests for a specific file
+- `codebeaver e2e`: Runs end-to-end tests defined in codebeaver.yml
 
-## Get started
+### Command Options
 
-- [Create your account](https://app.codebeaver.ai/login)
-- [Read the docs](https://docs.codebeaver.ai/getting-started/quickstart)
-- [Configure with codebeaver.yml](https://docs.codebeaver.ai/configuration)
+#### Global Options
+
+- `-v, --verbose`: Enable verbose logging output
+- `--version`: Display CodeBeaver version number
+
+#### Unit Test Command
+
+```bash
+codebeaver unit --file <file_path> [--template <template_name>] [--max-files-to-test <number>] [--verbose]
+```
+
+- `--file`: (Required) Path to the file to analyze
+- `--template`: (Optional) Testing framework template to use (e.g., pytest, jest, vitest). If not specified, uses template from codebeaver.yml
+- `--max-files-to-test`: (Optional) Maximum number of files to generate unit tests for (default: 10)
+- `-v, --verbose`: (Optional) Enable verbose logging output
+
+#### E2E Test Command
+
+```bash
+codebeaver e2e [--config <config_file>] [--verbose]
+```
+
+- `--config`: (Optional) Path to the YAML configuration file (defaults to codebeaver.yml)
+- `-v, --verbose`: (Optional) Enable verbose logging output
+
+### Environment Variables
+
+- `OPENAI_API_KEY`: (Required) Your OpenAI API key
+- `CHROME_INSTANCE_PATH`: Path to your Chrome instance. Defaults to `/Applications/Google Chrome.app/Contents/MacOS/Google Chrome`
+
+### Supported Languages and Frameworks
+
+CodeBeaver currently supports:
+
+- Python
+- TypeScript
+
+## Resources
+
+- [CodeBeaver Cloud docs](https://docs.codebeaver.ai/getting-started/quickstart)
+- E2E is powered by [BrowserUse](https://github.com/browser-use/browser-use)
+
+## Roadmap
+
+- [✅] Unit tests
+- [✅] E2E Tests
+- [ ] Integration Tests
+- [ ] Unit Tests: Add support for more languages and frameworks
+- [ ] Unit Tests: Add support for more testing frameworks
+- [ ] Add support for more models
 
 ## Let's chat!
 

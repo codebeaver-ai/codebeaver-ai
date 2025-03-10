@@ -1,0 +1,30 @@
+main_service: golang
+services:
+  golang:
+    image: golang:1.22.12-bullseye
+test_commands:
+  - export GOPATH="$HOME/go"
+  - export PATH=$PATH:$GOPATH/bin
+  - set -o pipefail && go test -v -json -covermode=atomic -coverprofile=coverage.out ./... -count=1 2>&1 | tee go-test-results.json
+single_file_test_commands:
+  - export GOPATH="$HOME/go"
+  - export PATH=$PATH:$GOPATH/bin
+  - set -o pipefail && go test -v -json -covermode=atomic -coverprofile=coverage.out ./$(dirname "$FILE_TO_COVER") -count=1 2>&1 | tee go-test-results.json
+setup_commands:
+  - apt-get update -qqy || true && apt-get install -qqy curl apt-utils git || true
+  - if [ -f "go.mod" ]; then go mod download; fi
+  - if [ -f "go.mod" ]; then go mod tidy; fi
+  - if [ -f "tools.go" ]; then go install $(go list -f '{{.Imports}}' tools.go | tr -d '[]'); fi
+  - go install golang.org/x/tools/cmd/goimports@latest || true
+  - go install golang.org/x/lint/golint@latest || true
+  - go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest || true
+  - go install honnef.co/go/tools/cmd/staticcheck@latest || true
+  - export GOPATH="$HOME/go"
+  - export PATH=$PATH:$GOPATH/bin
+ignore:
+  - "**/vendor/**"
+  - "**/mock_*.go"
+  - "**/*.pb.go"
+  - "**/*.mock.go"
+  - "**/testdata/**"
+  - "**/mocks/**"

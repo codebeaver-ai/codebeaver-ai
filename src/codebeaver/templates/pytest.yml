@@ -1,0 +1,41 @@
+main_service: python
+services:
+  python:
+    image: python:3.11-slim
+test_commands:
+  - coverage run --rcfile=.coveragerc -m pytest --show-capture=no --json-report --continue-on-collection-errors
+  - coverage combine || true
+  - coverage json -i || true
+single_file_test_commands:
+  - coverage run -m pytest --json-report "$TEST_FILE"
+  - coverage json
+setup_commands:
+  - apt-get update -qqy || true && apt-get install -qqy curl apt-utils || true && apt-get install -qqy git || true
+  - python -m ensurepip --default-pip || true
+  - python -m pip install --upgrade pip || true
+  - if [ -f "requirements.txt" ]; then pip install -q -r requirements.txt || true; fi
+  - if [ -f "requirements-dev.txt" ]; then pip install -q -r requirements-dev.txt || true; fi
+  - if [ -f "requirements-test.txt" ]; then pip install -q -r requirements-test.txt || true; fi
+  - find . -maxdepth 3 \( -name "requirements*.txt" -o -name "*requirements*.txt" -o -name "requirements/*.txt" -o -name "requirements/**/*.txt" -o -name "requirements.in" -o -name "dev-requirements.txt" -o -name "test-requirements.txt" -o -path "*/requirements/*.txt" \) -type f -exec pip install -q -r {} \; || if [ ! -f "requirements.txt" ] && [ ! -f "requirements/base.txt" ] && [ -f "Pipfile" ]; then pip install -q pipenv && pipenv install --dev --system; fi || true
+  - find . -maxdepth 3 \( -name "requirements*.txt" -o -name "*requirements*.txt" -o -name "requirements/*.txt" -o -name "requirements/**/*.txt" -o -name "requirements.in" -o -name "local-requirements.txt" -o -path "*/requirements/*.txt" \) -type f -exec pip install -q -r {} \; || if [ ! -f "requirements.txt" ] && [ ! -f "requirements/local.txt" ] && [ -f "Pipfile" ]; then pip install -q pipenv && pipenv install --dev --system; fi || true
+  - find . -maxdepth 3 \( -name "requirements*.txt" -o -name "*requirements.txt" -o -name "requirements/*.txt" -o -name "requirements/**/*.txt" -o -name "requirements.in" -o -name "test-requirements.txt" -o -path "*/requirements/*.txt" \) -type f -exec pip install -q -r {} \; || if [ ! -f "requirements.txt" ] && [ ! -f "requirements/test.txt" ] && [ -f "Pipfile" ]; then pip install -q pipenv && pipenv install --dev --system; fi || true
+  - if [ -f "setup.cfg" ]; then pip install -q -e .[test] || true; fi
+  - if [ -f "pyproject.toml" ]; then pip install -e .[dev] || pip install -e .[test] || pip install -e . || true; fi
+  - python -c "import black" 2>/dev/null || pip install -q "black" || true
+  - python -c "import isort" 2>/dev/null || pip install -q "isort" || true
+  - python -c "import ruff" 2>/dev/null || pip install -q "ruff" || true
+  - python -c "import mypy" 2>/dev/null || pip install -q "mypy" || true
+  - python -c "import coverage" 2>/dev/null || pip install -q "coverage" || true
+  - if [ ! -f ".coveragerc" ]; then echo "[run]\nrelative_files = True\nsource = .\ninclude =\n    *.py\nomit =\n    */test_*.py\n    */*_test.py\n    */tests/*\n    */testing/*\n    */test/*\n    tests/**\n    **/tests/**\n    .tox/*\n    /usr/*\n[report]\nshow_missing = True" > .coveragerc; fi
+  - python -c "import pytest" 2>/dev/null || pip install -q "pytest" || true
+  - python -c "import pytest" 2>/dev/null || pip install -q "pytest" || true
+  - python -c "import pytest_cov" 2>/dev/null || pip install -q "pytest-cov" || true
+  - python -c "import pytest_json_report" 2>/dev/null || pip install -q "pytest-json-report" || true
+  - python -c "import django" 2>/dev/null && python -c "import pytest_django" 2>/dev/null || (python -c "import django" 2>/dev/null && pip install -q "pytest-django") || true
+ignore:
+  - "**/migrations" # Ignores all migrations folders
+  - "**/*_initial.py" # Ignores initial migration files
+  - "**/*_auto_*.py" # Ignores auto-generated migration files
+  - "*manage.py"
+  - "*__init__.py"
+  - "*__main__.py"

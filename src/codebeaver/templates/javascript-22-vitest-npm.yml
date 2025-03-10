@@ -1,0 +1,36 @@
+main_service: node
+services:
+  node:
+    image: node:22.13.1-slim
+test_commands:
+  - 'npx vitest run --coverage.include="**/*.{js,jsx,ts,tsx}" --coverage.all=true --reporter=json --outputFile=vitest-results.json'
+  - 'if [ -f "coverage/coverage-final.json" ]; then mv coverage/coverage-final.json coverage.json; else echo "Warn: coverage/coverage-final.json not found"; exit 1; fi'
+single_file_test_commands:
+  - "npx vitest run --coverage $TEST_FILE --reporter=json --outputFile=vitest-results.json"
+  - 'if [ -f "coverage/coverage-final.json" ]; then mv coverage/coverage-final.json coverage.json; else echo "Warn: coverage/coverage-final.json not found"; exit 1; fi'
+setup_commands:
+  - apt-get update -qqy || true
+  - apt-get install -qqy git || true
+  - npm install --legacy-peer-deps
+  - npm install -g npx || true
+  - npm install --save-dev vitest@latest ts-node || true
+  - npm install --save-dev @vitest/coverage-v8@latest || true
+  - npm install --save-dev @testing-library/react || true
+  - npm install --save-dev @testing-library/dom || true
+  - npm install --save-dev @testing-library/jest-dom || true
+  - npm install --save-dev @testing-library/user-event || true
+  - npm install --save-dev jest-environment-jsdom || true
+  - npm install --save-dev @vitest/coverage-istanbul || true
+ignore:
+  - "*prettierrc*"
+  - "*eslintrc*"
+  - "*stylelintrc*"
+  - "*commitlintrc*"
+  - "*lintstagedrc*"
+  - "*huskyrc*"
+  - "*config.test.*"
+  - "*.config.js"
+  - "*.config.ts"
+  - "*.config.jsx"
+  - "*/config.*"
+  - "config.*"

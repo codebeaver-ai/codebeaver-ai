@@ -1,0 +1,45 @@
+main_service: node
+services:
+  node:
+    image: node:22.13.1-slim
+test_commands:
+  - 'npx vitest run --coverage.include="**/*.{js,jsx,ts,tsx}" --coverage.all=true --reporter=json --outputFile=vitest-results.json'
+  - 'if [ -f "coverage/coverage-final.json" ]; then mv coverage/coverage-final.json coverage.json; else echo "Warn: coverage/coverage-final.json not found"; exit 1; fi'
+single_file_test_commands:
+  - "npx vitest run --coverage $TEST_FILE --reporter=json --outputFile=vitest-results.json"
+  - 'if [ -f "coverage/coverage-final.json" ]; then mv coverage/coverage-final.json coverage.json; else echo "Warn: coverage/coverage-final.json not found"; exit 1; fi'
+setup_commands:
+  - apt-get update -qqy || true
+  - apt-get install -qqy git || true
+  - npm install -g pnpm
+  - pnpm install || true
+  - pnpm add -D typescript || true
+  - pnpm add -D @types/node || true
+  - pnpm add -D vitest@latest || true
+  - pnpm add -D @vitest/coverage-v8@latest || true
+  - pnpm add -D @vitest/coverage-istanbul || true
+  - pnpm add -D @babel/core || true
+  - pnpm add -D @babel/preset-typescript || true
+  - pnpm add -D @babel/preset-react || true
+  - pnpm add -D @babel/preset-env || true
+  - pnpm add -D @testing-library/react || true
+  - pnpm add -D @testing-library/dom || true
+  - pnpm add -D @testing-library/jest-dom || true
+  - pnpm add -D @testing-library/user-event || true
+  - pnpm add -D jsdom || true
+  - '[ -f tsconfig.json ] || echo ''{"compilerOptions":{"target":"es5","module":"commonjs","strict":true,"esModuleInterop":true,"skipLibCheck":true,"forceConsistentCasingInFileNames":true,"jsx":"react-jsx","types":["jest","node"]}}'' > tsconfig.json'
+  - '[ -f babel.config.js ] || echo ''module.exports={presets:[["@babel/preset-env",{targets:{node:"current"}}],"@babel/preset-typescript",["@babel/preset-react",{runtime:"automatic"}]]}'' > babel.config.js'
+ignore:
+  - "*prettierrc*"
+  - "*eslintrc*"
+  - "*stylelintrc*"
+  - "*commitlintrc*"
+  - "*lintstagedrc*"
+  - "*huskyrc*"
+  - "*config.test.*"
+  - "*.config.js"
+  - "*.config.ts"
+  - "*.config.jsx"
+  - "*.d.ts"
+  - "*/config.*"
+  - "config.*"

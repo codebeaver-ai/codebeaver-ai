@@ -1,0 +1,37 @@
+ignore:
+  - "*prettierrc*"
+  - "*eslintrc*"
+  - "*stylelintrc*"
+  - "*commitlintrc*"
+  - "*lintstagedrc*"
+  - "*huskyrc*"
+  - "*config.test.*"
+  - "*.config.js"
+  - "*.config.ts"
+  - "*.config.jsx"
+main_service: bun
+services:
+  bun:
+    environment:
+      - BUN_TEST_USE_DOM=true
+    image: oven/bun:1
+setup_commands:
+  - bun install || true
+  - '[ -z "$(bun pm ls | grep @testing-library/react)" ] && bun add -d @testing-library/react || true'
+  - '[ -z "$(bun pm ls | grep @testing-library/jest-dom/extend-expect)" ] && bun add -d @testing-library/jest-dom/extend-expect || true'
+  - '[ -z "$(bun pm ls | grep @testing-library/dom)" ] && bun add -d @testing-library/dom || true'
+  - '[ -z "$(bun pm ls | grep @testing-library/jest-dom)" ] && bun add -d @testing-library/jest-dom || true'
+  - '[ -z "$(bun pm ls | grep @testing-library/user-event)" ] && bun add -d @testing-library/user-event || true'
+  - '[ -z "$(bun pm ls | grep jest-environment-jsdom)" ] && bun add -d jest-environment-jsdom || true'
+  - '[ -z "$(bun pm ls | grep happy-dom)" ] && bun add -d happy-dom || true'
+  - '[ ! -f bunfig.toml ] && echo "[test]\npreload = \"./setup-tests.ts\"" > bunfig.toml || true'
+  - '[ ! -f setup-tests.ts ] && echo "import { beforeAll, afterAll } from \"bun:test\"; import { createHappyDOM } from \"happy-dom\"; const happyDOM = createHappyDOM(); beforeAll(() => { global.window = happyDOM.window; global.document = happyDOM.window.document; global.navigator = happyDOM.window.navigator; global.Element = happyDOM.window.Element; }); afterAll(() => { delete global.window; delete global.document; delete global.navigator; delete global.Element; });" > setup-tests.ts || true'
+single_file_test_commands:
+  - bun test --coverage --coverage-reporter=lcov --coverageReporters=json --jsx-dom-runtime --json --outputFile=jest-results.json
+    --collectCoverageFrom=$FILE_TO_COVER --passWithNoTests "$TEST_FILE" || [ $? -eq 1 -o $? -eq 5 ]
+  - "if [ -f 'coverage/coverage-final.json' ]; then mv coverage/coverage-final.json coverage.json; else echo 'Warn: coverage/coverage-final.json not found'; exit 1; fi"
+test_commands:
+  - bun test --coverage --coverageReporters=json --coverage-reporter=lcov --jsx-dom-runtime --json --outputFile=jest-results.json
+    --collectCoverageFrom='**/*.{js,jsx,ts,tsx}' --coveragePathIgnorePatterns='node_modules'
+    --passWithNoTests || [ $? -eq 1 -o $? -eq 5 ]
+  - "if [ -f 'coverage/coverage-final.json' ]; then mv coverage/coverage-final.json coverage.json; else echo 'Warn: coverage/coverage-final.json not found'; exit 1; fi"
