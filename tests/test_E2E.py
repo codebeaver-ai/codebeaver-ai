@@ -3,6 +3,7 @@ import json
 import os
 import pytest
 from pydantic import ValidationError
+import logging
 
 from codebeaver.E2E import E2E, End2endTest
 
@@ -27,9 +28,10 @@ class FakeHistory:
 
 class FakeAgent:
     def __init__(self, task, llm, browser, controller):
-        self.task = task
-        self.llm = llm
-        self.browser = browser
+        with open("e2e.json", "w") as f:
+            json.dump([test.model_dump() for test in all_tests], f)
+        passed_count = sum(1 for t in all_tests if t.passed)
+        print(f"{passed_count}/{len(all_tests)} E2E tests passed")
         self.controller = controller
     async def run(self):
         if "simulate_no_result" in self.task:
@@ -336,3 +338,164 @@ class TestE2E:
         dump = test_obj.model_dump()
         expected_keys = {"steps", "url", "passed", "errored", "comment", "name"}
         assert set(dump.keys()) == expected_keys
+    def test_end2endtest_non_list_steps(self):
+        """Test that End2endTest raises a validation error when steps is not a list."""
+        with pytest.raises(Exception) as excinfo:
+            End2endTest(name="NonListSteps", steps="click button", url="http://example.com")
+        assert "list" in str(excinfo.value)
+    async def test_run_missing_keys_in_test(self):
+        """Test that run() raises KeyError when test dictionary is missing the required 'steps' key."""
+        tests_dict = {"TestMissing": {"url": "http://example.com"}}  # Missing 'steps'
+        e2e = E2E(tests=tests_dict)
+        with pytest.raises(KeyError):
+            await e2e.run()
+
+    async def test_debug_logging(self, monkeypatch):
+        """Test that debug logging is called with the correct message during run()."""
+        debug_messages = []
+        logger = logging.getLogger('codebeaver')
+        def fake_debug(msg, *args, **kwargs):
+            debug_messages.append(msg)
+        monkeypatch.setattr(logger, "debug", fake_debug)
+        tests_dict = {"TestDebug": {"steps": ["step"], "url": "http://example.com"}}
+        e2e = E2E(tests=tests_dict)
+        await e2e.run()
+        assert any("Running E2E: TestDebug" in message for message in debug_messages)
+    async def test_run_preserves_order(self, tmp_path, capsys):
+        """Test that the run() method returns tests in the same insertion order as provided."""
+        # Change working directory so that the file is written in tmp_path
+        import json
+        from codebeaver.E2E import E2E, End2endTest
+        import asyncio
+        import os
+        os.chdir(tmp_path)
+        tests_dict = {}
+        # Insert tests in a known order
+        tests_dict["AlphaTest"] = {"steps": ["step1"], "url": "http://example.com"}
+        tests_dict["BetaTest"] = {"steps": ["simulate_failure"], "url": "http://example.com"}
+        e2e = E2E(tests=tests_dict)
+        results = await e2e.run()
+        # Check that the results are in the same order as inserted
+        names = [res.name for res in results]
+        assert names == list(tests_dict.keys())
+        # Also check that the summary output printed the correct ratio (AlphaTest passed, BetaTest failed)
+        captured = capsys.readouterr().out
+        assert "1/2 E2E tests passed" in captured
+    async def test_run_non_dict_raises(self):
+        """Test that run() method raises an error when tests is not a dict."""
+        e2e = E2E(tests=["not", "a", "dict"])
+        with pytest.raises(AttributeError):
+            await e2e.run()
+
+    async def test_run_missing_url(self, monkeypatch):
+        """Test that run() raises a KeyError when a test dictionary is missing the required 'url' key."""
+        tests_dict = {"TestMissingURL": {"steps": ["step1"]}}  # Missing 'url' field
+        e2e = E2E(tests=tests_dict)
+        with pytest.raises(KeyError):
+            await e2e.run()
+    async def test_run_test_non_string_agent_result(self, monkeypatch):
+        """Test run_test when FakeHistory.final_result returns a non-string object, expecting an exception."""
+        from codebeaver.E2E import E2E, End2endTest, FakeHistory
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="TestNonStringResult", steps=["step1"], url="http://example.com")
+        monkeypatch.setattr(FakeHistory, "final_result", lambda self: 123)
+        with pytest.raises(Exception):
+            await e2e.run_test(test_obj)
+
+    async def test_fake_agent_called_count(self, monkeypatch):
+        """Test that FakeAgent.__init__ is called once per test in run() method."""
+        from codebeaver.E2E import E2E, FakeAgent
+        call_count = 0
+        original_init = FakeAgent.__init__
+        def counting_init(self, task, llm, browser, controller):
+            nonlocal call_count
+            call_count += 1
+            self.llm = llm
+            self.browser = browser
+            self.controller = controller
+        monkeypatch.setattr(FakeAgent, "__init__", counting_init)
+        tests_dict = {
+            "TestOne": {"steps": ["step1"], "url": "http://example.com"},
+            "TestTwo": {"steps": ["simulate_failure"], "url": "http://example.com"}
+        }
+        e2e = E2E(tests=tests_dict)
+        await e2e.run()
+        assert call_count == 2
+        monkeypatch.setattr(FakeAgent, "__init__", original_init)
+    async def test_run_test_empty_string_result(self, monkeypatch):
+        """Test run_test returns error state when the agent returns an empty string as the result."""
+        from codebeaver.E2E import E2E, End2endTest, FakeHistory
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="TestEmptyStringResult", steps=["empty"], url="http://example.com")
+        monkeypatch.setattr(FakeHistory, "final_result", lambda self: "")
+        result = await e2e.run_test(test_obj)
+        assert result.errored is True
+        assert result.comment == "No result from the test"
+    async def test_run_ignores_extra_keys_in_test_dictionary(self, monkeypatch, tmp_path):
+        """Test that extra keys in the test dictionary are ignored by E2E.run()."""
+        monkeypatch.chdir(tmp_path)
+        tests_dict = {
+            "TestExtra": {"steps": ["step1"], "url": "http://example.com", "unused_key": "value"}
+        }
+        e2e = E2E(tests=tests_dict)
+        results = await e2e.run()
+        # Verify that the test result is processed normally despite the extra key
+        assert len(results) == 1
+        assert results[0].passed is True
+        assert results[0].comment == "Test succeeded"
+
+    async def test_run_test_valid_json_whitespace(self, monkeypatch):
+        """Test that run_test correctly handles valid JSON output with extra whitespace."""
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="TestWhitespace", steps=["step1"], url="http://example.com")
+        # Patch FakeHistory.final_result to simulate a valid JSON string surrounded by whitespace.
+        monkeypatch.setattr(FakeHistory, "final_result", lambda self: "  " + json.dumps({"passed": True, "comment": "Test succeeded"}) + "  ")
+        result = await e2e.run_test(test_obj)
+        assert result.passed is True
+        assert result.comment == "Test succeeded"
+    def test_end2endtest_invalid_url_type(self):
+        """Test that End2endTest raises a validation error when url is not a string."""
+        with pytest.raises(Exception) as excinfo:
+            End2endTest(name="InvalidURLType", steps=["step1"], url=123)
+        assert "str" in str(excinfo.value)
+
+    async def test_run_test_browser_constructor_exception(self, monkeypatch):
+        """Test that run_test propagates an exception if the Browser constructor fails."""
+        monkeypatch.setattr("codebeaver.E2E.Browser.__init__", lambda self, config: (_ for _ in ()).throw(Exception("Browser init error")))
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="TestBrowserInitError", steps=["step1"], url="http://example.com")
+        with pytest.raises(Exception, match="Browser init error"):
+            await e2e.run_test(test_obj)
+    async def test_run_none_tests(self):
+        """Test that run() raises an error when tests is None."""
+        e2e = E2E(tests=None)
+        with pytest.raises(AttributeError):
+            await e2e.run()
+
+    async def test_env_variable_empty(self, monkeypatch):
+        """Test that when CHROME_INSTANCE_PATH is set to an empty string, the default path is used."""
+        monkeypatch.setenv("CHROME_INSTANCE_PATH", "")
+        e2e = E2E(tests={})
+    async def test_agent_exception_browser_not_closed(self, monkeypatch):
+        """Test that when Agent.run raises an exception, the browser's close method is not called."""
+        captured_browser = {}
+        from codebeaver.E2E import E2E, End2endTest, FakeBrowser
+        # Patch FakeBrowser.__init__ to capture the created instance
+        original_init = FakeBrowser.__init__
+        def new_init(self, config):
+            captured_browser["instance"] = self
+            original_init(self, config)
+        monkeypatch.setattr(FakeBrowser, "__init__", new_init)
+        # Patch Agent.run to raise an exception so that browser.close() is never reached
+        monkeypatch.setattr("codebeaver.E2E.Agent.run", lambda self: (_ for _ in ()).throw(Exception("Agent error")))
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="TestAgentException", steps=["step1"], url="http://example.com")
+        import pytest
+        with pytest.raises(Exception, match="Agent error"):
+            await e2e.run_test(test_obj)
+        # Verify that the captured FakeBrowser instance was created and its close method was not called
+        assert "instance" in captured_browser, "Expected FakeBrowser instance to have been created"
+        assert captured_browser["instance"].closed is False, "Expected the browser not to be closed when Agent.run fails"
+        # Restore the original FakeBrowser.__init__
+        monkeypatch.setattr(FakeBrowser, "__init__", original_init)
+        assert e2e.chrome_instance_path == "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
