@@ -5,11 +5,17 @@ import pytest
 from pydantic import ValidationError
 
 from codebeaver.E2E import E2E, End2endTest
+from browser_use.browser.context import BrowserContextConfig
 
 # Fake classes to simulate Browser and Agent behavior
 class FakeBrowser:
     def __init__(self, config):
         self.config = config
+        with open(Path.cwd() / ".codebeaver/e2e.json", "w") as f:
+            json.dump([test.model_dump() for test in all_tests], f)
+        passed_count = sum(1 for test in all_tests if test.passed and not test.errored)
+        print(f"{passed_count}/{len(all_tests)} E2E tests passed")
+        return all_tests
         self.closed = False
     async def close(self):
         self.closed = True
@@ -261,6 +267,7 @@ class TestE2E:
         assert isinstance(data, list)
         assert len(data) == 3
         # Check that the summary printed output contains "1/3 E2E tests passed"
+        assert "1/3 E2E tests passed" in captured
         captured = capsys.readouterr().out
     @pytest.mark.asyncio
     async def test_agent_task_string_multiple_steps(self, monkeypatch):
@@ -336,3 +343,182 @@ class TestE2E:
         dump = test_obj.model_dump()
         expected_keys = {"steps", "url", "passed", "errored", "comment", "name"}
         assert set(dump.keys()) == expected_keys
+    @pytest.mark.asyncio
+    async def test_run_missing_fields_in_tests(self):
+        """Test that run method raises KeyError when test dictionary is missing required fields."""
+        tests_dict = {
+            "TestMissing": {"url": "http://example.com"}  # missing "steps" key intentionally
+        }
+        e2e = E2E(tests=tests_dict)
+        with pytest.raises(KeyError):
+            await e2e.run()
+
+    @pytest.mark.asyncio
+    async def test_gitutils_called(self, monkeypatch):
+        """Test that GitUtils.ensure_codebeaver_folder_exists_and_in_gitignore is called in run_test."""
+        call_count = 0
+        def fake_gitutils():
+            nonlocal call_count
+            call_count += 1
+        monkeypatch.setattr("codebeaver.E2E.GitUtils.ensure_codebeaver_folder_exists_and_in_gitignore", fake_gitutils)
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="TestGitUtils", steps=["step1"], url="http://example.com")
+        await e2e.run_test(test_obj)
+        assert call_count == 1
+
+    @pytest.mark.asyncio
+    async def test_logging_debug_output(self, monkeypatch, caplog, tmp_path):
+        """Test that debug logging output is generated during run method execution."""
+        # set logger level to DEBUG
+        import logging
+        logger_instance = logging.getLogger("codebeaver")
+        logger_instance.setLevel("DEBUG")
+        monkeypatch.chdir(tmp_path)
+        tests_dict = {"TestLog": {"steps": ["step1"], "url": "http://example.com"}}
+        e2e = E2E(tests=tests_dict)
+        await e2e.run()
+        debug_messages = [record.message for record in caplog.records if record.levelname == "DEBUG"]
+        # Check that at least one debug message contains "Running E2E"
+        assert any("Running E2E:" in message for message in debug_messages)
+    async def test_run_test_browser_init_exception(self, monkeypatch):
+        """Test that run_test propagates exception when Browser.__init__ raises an error."""
+        def faulty_browser_init(self, config):
+            raise Exception("Browser initialization error")
+        monkeypatch.setattr("codebeaver.E2E.Browser.__init__", faulty_browser_init)
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="TestBrowserInitException", steps=["step1"], url="http://example.com")
+        with pytest.raises(Exception, match="Browser initialization error"):
+            await e2e.run_test(test_obj)
+    @pytest.mark.asyncio
+    async def test_run_test_context_config_error(self, monkeypatch):
+        """Test that run_test propagates an exception when BrowserContextConfig initialization fails."""
+        # Monkey-patch BrowserContextConfig.__init__ to simulate an initialization error
+        monkeypatch.setattr(BrowserContextConfig, "__init__", lambda self, *args, **kwargs: (_ for _ in ()).throw(Exception("Config error")))
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="TestContextConfigError", steps=["step1"], url="http://example.com")
+        with pytest.raises(Exception, match="Config error"):
+            await e2e.run_test(test_obj)
+    @pytest.mark.asyncio
+    @pytest.mark.asyncio
+    async def test_run_aborts_on_exception(self, monkeypatch, tmp_path):
+        """Test that the run method aborts immediately if any test execution raises an exception and no output file is written."""
+        monkeypatch.chdir(tmp_path)
+        tests_dict = {
+            "TestAbort": {"steps": ["trigger_exception"], "url": "http://example.com"}
+        }
+        e2e = E2E(tests=tests_dict)
+        # Monkey-patch run_test to always throw an exception so that run() aborts.
+        monkeypatch.setattr(e2e, "run_test", lambda test: (_ for _ in ()).throw(Exception("Test failure")))
+        with pytest.raises(Exception, match="Test failure"):
+            await e2e.run()
+        from pathlib import Path
+        output_file = Path.cwd() / ".codebeaver" / "e2e.json"
+        assert not output_file.exists(), "Output file should not exist when run() aborts due to an exception."
+
+    @pytest.mark.asyncio
+    async def test_run_twice(self, monkeypatch, tmp_path):
+        """Test that running the E2E.run() method twice overwrites the output file each time."""
+        from pathlib import Path
+        monkeypatch.chdir(tmp_path)
+        tests_dict = {
+            "TestRepeat": {"steps": ["step1"], "url": "http://example.com"}
+        }
+        e2e = E2E(tests=tests_dict)
+        # First run of the tests triggers creation of the output file.
+        results_first = await e2e.run()
+        output_path = Path.cwd() / ".codebeaver" / "e2e.json"
+        assert output_path.exists(), "The e2e.json file should exist after the first run."
+        with open(output_path, "r") as f:
+            data_first = json.load(f)
+        assert isinstance(data_first, list)
+        assert len(data_first) == 1, "Expected one test result in the output file after the first run."
+        # Second run – the file should be overwritten, not appended.
+        results_second = await e2e.run()
+        with open(output_path, "r") as f:
+            data_second = json.load(f)
+        assert isinstance(data_second, list)
+        assert len(data_second) == 1, "Expected one test result in the output file after the second run."
+        # Verify that the test result remains as expected—the fake agent always returns success.
+        assert data_second[0]["comment"] == "Test succeeded"
+        assert data_second[0]["comment"] == "Test succeeded"
+    @pytest.mark.asyncio
+    async def test_e2e_directory_created(self, monkeypatch, tmp_path):
+        """Test that the .codebeaver directory is created by GitUtils.ensure_codebeaver_folder_exists_and_in_gitignore during run_test."""
+        import os
+        from pathlib import Path
+        monkeypatch.chdir(tmp_path)
+        # Monkey-patch the GitUtils function to create the .codebeaver directory when run_test is called.
+        monkeypatch.setattr("codebeaver.E2E.GitUtils.ensure_codebeaver_folder_exists_and_in_gitignore", lambda: os.makedirs(Path.cwd() / ".codebeaver", exist_ok=True))
+        from codebeaver.E2E import E2E, End2endTest
+        # Create a simple test definition; note that run_test expects an End2endTest instance.
+        e2e = E2E(tests={"TestCreate": {"steps": ["step1"], "url": "http://example.com"}})
+        test_obj = End2endTest(name="TestCreate", steps=["step1"], url="http://example.com")
+        await e2e.run_test(test_obj)
+        assert (Path.cwd() / ".codebeaver").exists(), "Expected .codebeaver directory to be created"
+    @pytest.mark.asyncio
+    async def test_gitutils_exception(self, monkeypatch):
+        """Test that run_test propagates an exception when GitUtils.ensure_codebeaver_folder_exists_and_in_gitignore fails."""
+        monkeypatch.setattr("codebeaver.E2E.GitUtils.ensure_codebeaver_folder_exists_and_in_gitignore", lambda: (_ for _ in ()).throw(Exception("GitUtils error")))
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="TestGitUtilsError", steps=["step1"], url="http://example.com")
+        with pytest.raises(Exception, match="GitUtils error"):
+            await e2e.run_test(test_obj)
+    async def test_browser_context_config_values(self, monkeypatch, tmp_path):
+        """Test that BrowserContextConfig is initialized with the correct save and trace paths."""
+        from pathlib import Path
+        # Import BrowserContext here as it is needed to capture its config argument.
+        from browser_use.browser.context import BrowserContext
+        # Prepare a container to capture the config values.
+        captured_config = {}
+        original_init = BrowserContext.__init__
+        def fake_init(self, browser, config):
+            captured_config['save_recording_path'] = config.save_recording_path
+            captured_config['trace_path'] = config.trace_path
+        monkeypatch.setattr(BrowserContext, "__init__", fake_init)
+        # Change current directory to tmp_path so that Path.cwd() returns tmp_path.
+        monkeypatch.chdir(tmp_path)
+        tests_dict = {"TestDummy": {"steps": ["step1"], "url": "http://example.com"}}
+        from codebeaver.E2E import E2E, End2endTest
+        e2e = E2E(tests=tests_dict)
+        test_obj = End2endTest(name="TestDummy", steps=["step1"], url="http://example.com")
+        # Run the test (we are not interested in the actual outcome here, only the underlying config)
+        await e2e.run_test(test_obj)
+        expected_path = Path(tmp_path) / ".codebeaver"
+        assert captured_config.get('save_recording_path') == expected_path
+        assert captured_config.get('trace_path') == expected_path
+        # Restore the original BrowserContext.__init__
+        monkeyatch.setattr(BrowserContext, "__init__", original_init)
+    @pytest.mark.asyncio
+    async def test_run_results_order(self, monkeypatch, tmp_path):
+        """Test that run() returns test results in the same order as the input tests dictionary."""
+        monkeypatch.chdir(tmp_path)
+        tests_dict = {
+            "first": {"steps": ["step1"], "url": "http://example.com"},
+            "second": {"steps": ["step2"], "url": "http://example.com"},
+            "third": {"steps": ["step3"], "url": "http://example.com"}
+        }
+        e2e = E2E(tests=tests_dict)
+        results = await e2e.run()
+        order = [res.name for res in results]
+        assert order == ["first", "second", "third"]
+
+    @pytest.mark.asyncio
+    async def test_agent_llm_parameter(self, monkeypatch):
+        """Test that the ChatOpenAI instance with model 'gpt-4o' is passed to the Agent."""
+        from langchain_openai import ChatOpenAI
+        captured_llm = []
+        original_init = FakeAgent.__init__
+        def new_init(self, task, llm, browser, controller):
+            captured_llm.append(llm)
+            self.task = task
+            self.llm = llm
+            self.browser = browser
+            self.controller = controller
+        monkeypatch.setattr(FakeAgent, "__init__", new_init)
+        e2e = E2E(tests={"TestLLM": {"steps": ["step1"], "url": "http://example.com"}})
+        await e2e.run_test(End2endTest(name="TestLLM", steps=["step1"], url="http://example.com"))
+        assert captured_llm, "Expected llm to be captured in Agent.__init__"
+        llm_instance = captured_llm[0]
+        assert hasattr(llm_instance, "model"), "Expected llm to have attribute 'model'"
+        assert llm_instance.model == "gpt-4o"
+        monkeypatch.setattr(FakeAgent, "__init__", original_init)
