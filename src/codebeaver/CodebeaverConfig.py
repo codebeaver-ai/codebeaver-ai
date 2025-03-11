@@ -167,6 +167,12 @@ class CodeBeaverConfig:
             if template_config.run_setup is not None and self.unit.run_setup is None:
                 self.unit.run_setup = template_config.run_setup
 
+            # Add max_attempts merge logic
+            if (
+                template_config.max_attempts != 4
+            ):  # Only merge if template has non-default value
+                self.unit.max_attempts = template_config.max_attempts
+
             # For ignore list, merge if template has values and current list is empty
             if template_config.ignore and not self.unit.ignore:
                 self.unit.ignore = template_config.ignore
