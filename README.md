@@ -77,7 +77,9 @@ login-test: Success!
 
 ## GitHub Action
 
-CodeBeaver can be used in a GitHub Action to run unit tests on every commit and E2E tests after you release a new version.
+CodeBeaver can be used in a [GitHub Action](https://github.com/codebeaver-ai/codebeaver-oss-action) to run unit tests on every commit and E2E tests after you release a new version.
+
+Check out the action's [README](https://github.com/codebeaver-ai/codebeaver-oss-action/blob/main/README.md) for more information, but here's a quick example:
 
 ```yaml
 name: Run CodeBeaver
