@@ -31,11 +31,9 @@ class TestCodeBeaverConfig(unittest.TestCase):
                 "ignore": ["ignore_unit"],
             },
             "e2e": {
-                "tests": {
-                    "checkout": {
-                        "url": "http://example.org",
-                        "steps": ["stepA", "stepB"],
-                    }
+                "checkout": {
+                    "url": "http://example.org",
+                    "steps": ["stepA", "stepB"],
                 }
             },
             "from": "dummy_template",
@@ -88,9 +86,7 @@ class TestCodeBeaverConfig(unittest.TestCase):
                 "max_attempts": 3,
             },
             "e2e": {
-                "tests": {
-                    "login": {"url": "http://example.com", "steps": ["step1", "step2"]}
-                }
+                "login": {"url": "http://example.com", "steps": ["step1", "step2"]}
             },
         }
         config = CodeBeaverConfig.from_yaml(yaml_content)
@@ -170,11 +166,9 @@ class TestCodeBeaverConfig(unittest.TestCase):
                 "max_attempts": 4,
             },
             "e2e": {
-                "tests": {
-                    "checkout": {
-                        "url": "http://example.org",
-                        "steps": ["stepA", "stepB"],
-                    }
+                "checkout": {
+                    "url": "http://example.org",
+                    "steps": ["stepA", "stepB"],
                 }
             },
         }
@@ -199,11 +193,9 @@ class TestCodeBeaverConfigFixed(unittest.TestCase):
             "name": "E2ETestWorkspace",
             "path": "/tmp/e2e_test",
             "e2e": {
-                "tests": {
-                    "payment": {
-                        "url": "http://pay.example.com",
-                        "steps": ["init", "pay", "confirm"],
-                    }
+                "payment": {
+                    "url": "http://pay.example.com",
+                    "steps": ["init", "pay", "confirm"],
                 }
             },
         }
