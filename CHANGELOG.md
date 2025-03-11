@@ -1,25 +1,3 @@
-## 1.0.0 (2025-03-10)
-
-
-### Bug Fixes
-
-* **release:** better types, logging and first version of analyzer ([ce4ac77](https://github.com/codebeaver-ai/codebeaver-ai/commit/ce4ac77814b4c780503b287823cdf03a7769ecfa))
-
-
-### Test
-
-* Add coverage improvement test for tests/test_E2E.py ([b128e32](https://github.com/codebeaver-ai/codebeaver-ai/commit/b128e320ae895880fbfd1aefec221d93f24bcc11))
-* Add coverage improvement test for tests/test_TestRunner.py ([489862f](https://github.com/codebeaver-ai/codebeaver-ai/commit/489862ffba10bc33c653ade165dff7ad120ab539))
-
-# Changelog
-
-All notable changes to this project will be documented in this file.
-
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
-
-## [Unreleased]
-
 ## [0.1.0] - 2024-03-10
 
 ### Added
