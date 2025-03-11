@@ -2,9 +2,12 @@
 Command-line interface for CodeBeaver
 """
 
+import os
+
+os.environ["ANONYMIZED_TELEMETRY"] = "false"
 import sys
 import argparse
-import os
+
 import pathlib
 import logging
 
@@ -117,6 +120,10 @@ Examples:
         help="Maximum number of files to generate unit tests for (default: 2)",
         dest="max_files_to_test",
     )
+    # Add verbose flag to unit parser
+    unit_parser.add_argument(
+        "-v", "--verbose", action="store_true", help="Enable verbose logging output"
+    )
 
     # E2E test command with enhanced help
     e2e_parser = subparsers.add_parser(
@@ -141,6 +148,10 @@ Examples:
         help="Path to the YAML configuration file (defaults to codebeaver.yml)",
         dest="yaml_file",  # Keep the same variable name for compatibility
     )
+    # Add verbose flag to e2e parser
+    e2e_parser.add_argument(
+        "-v", "--verbose", action="store_true", help="Enable verbose logging output"
+    )
 
     args = parser.parse_args(args)
 
@@ -163,12 +174,12 @@ Examples:
                 unit_args = argparse.Namespace()
                 unit_args.template = None
                 unit_args.file_path = None
-                unit_args.max_files_to_test = 10
+                unit_args.max_files_to_test = config["unit"].get("max_files_to_test", 5)
                 unit_args.verbose = args.verbose
                 unit_args.yaml_file = "codebeaver.yml"
                 run_unit_command(unit_args)
             else:
-                logger.info("No unit tests configured in codebeaver.yml, skipping...")
+                logger.info("No Unit Tests configured in codebeaver.yml, skipping...")
 
             if "e2e" in config:
                 logger.info("Running e2e tests...")
@@ -177,10 +188,12 @@ Examples:
 
                 run_e2e_command(args)
             else:
-                logger.info("No e2e tests configured in codebeaver.yml, skipping...")
+                logger.info("No E2E Tests configured in codebeaver.yml, skipping...")
 
             if "unit" not in config and "e2e" not in config:
-                logger.error("No tests configured in codebeaver.yml")
+                logger.error(
+                    "No tests configured in codebeaver.yml. Check out the documentation at https://github.com/codebeaver-ai/codebeaver-ai for more information."
+                )
                 sys.exit(1)
 
         except FileNotFoundError:

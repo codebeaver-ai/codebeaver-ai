@@ -38,12 +38,9 @@ jobs:
           pip install --upgrade pip setuptools wheel hatchling
           pip install -e .
           pip install build
-          python -m build
+          python -m build --wheel
           pip install --upgrade pkginfo==1.12.0 twine==6.0.1
           python -m twine check dist/*
-
-      - name: Debug Dist Directory
-        run: ls -al dist
 
       - name: Cache build
         uses: actions/cache@v3

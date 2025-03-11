@@ -1,15 +1,19 @@
 import os
+import json
 from browser_use import Agent, Controller
 from browser_use.browser.browser import Browser, BrowserConfig
+from browser_use.browser.context import BrowserContext
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
 from pydantic import BaseModel
-
+from .GitUtils import GitUtils
 import logging
+from browser_use.browser.context import BrowserContextConfig
+from pathlib import Path
 
 load_dotenv()
 
-logger = logging.getLogger('codebeaver')
+logger = logging.getLogger("codebeaver")
 
 
 class End2endTest(BaseModel):
@@ -58,29 +62,36 @@ class E2E:
             )
             test_result = await self.run_test(test)
             all_tests.append(test_result)
-        # write the results to e2e.json
-        # with open("e2e.json", "w") as f:
-        #     json.dump([test.model_dump() for test in all_tests], f)
+        # write the results to e2e.json. this is temporary, we will eventually use the report class
+        with open(Path.cwd() / ".codebeaver/e2e.json", "w") as f:
+            json.dump([test.model_dump() for test in all_tests], f)
         return all_tests
 
     async def run_test(self, test: End2endTest) -> End2endTest:
+        GitUtils.ensure_codebeaver_folder_exists_and_in_gitignore()  # avoid committing logs, screenshots and so on
+        config_context = BrowserContextConfig(
+            save_recording_path=Path.cwd() / ".codebeaver/",
+            trace_path=Path.cwd() / ".codebeaver/",
+        )
         browser = Browser(
             config=BrowserConfig(
                 # NOTE: you need to close your chrome browser - so that this can open your browser in debug mode
                 chrome_instance_path=self.chrome_instance_path,
             )
         )
+        context = BrowserContext(browser=browser, config=config_context)
         agent = Agent(
             task=f"""You are a QA tester. Follow these steps:
-          * Go to {test.url}
-          * {test.steps}
-          """,
+* Go to {test.url}
+"""
+            + "\n".join(f"* {step}" for step in test.steps),
             llm=ChatOpenAI(model="gpt-4o"),
-            browser=browser,
+            # browser=browser,
             controller=controller,
+            browser_context=context,
         )
         history = await agent.run()
-        await browser.close()
+        await context.close()
         result = history.final_result()
         if result:
             parsed: TestCase = TestCase.model_validate_json(result)

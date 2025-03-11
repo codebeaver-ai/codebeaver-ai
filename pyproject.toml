@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "codebeaver"
-version = "1.0.0"
+version = "0.1.2"
 description = "CodeBeaver - Unit and E2E testing for your codebase"
 readme = "README.md"
 requires-python = ">=3.11"
