@@ -83,8 +83,8 @@ class E2E:
         agent = Agent(
             task=f"""You are a QA tester. Follow these steps:
 * Go to {test.url}
-{'\n'.join([f'* {step}' for step in test.steps])}
-          """,
+"""
+            + "\n".join(f"* {step}" for step in test.steps),
             llm=ChatOpenAI(model="gpt-4o"),
             # browser=browser,
             controller=controller,
