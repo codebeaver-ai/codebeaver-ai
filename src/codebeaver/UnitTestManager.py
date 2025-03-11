@@ -6,6 +6,7 @@ from .UnitTestGenerator import UnitTestGenerator
 from .UnitTestRunner import UnitTestRunner
 from .TestFilePattern import TestFilePattern
 from .AnalyzeError import AnalyzeError
+from .GitUtils import GitUtils
 from .types import TestErrorType
 import logging
 from pathlib import Path
@@ -42,6 +43,7 @@ class UnitTestManager:
     def generate_unit_test(self, run_setup: bool = True):
         if not self.workspace_config.unit:
             raise ValueError("unit_test_config is required")
+        GitUtils.ensure_codebeaver_folder_exists_and_in_gitignore()
         testrunner = UnitTestRunner(
             self.workspace_config.unit.single_file_test_commands or [],
             self.workspace_config.unit.setup_commands or [],

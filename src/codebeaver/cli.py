@@ -2,9 +2,12 @@
 Command-line interface for CodeBeaver
 """
 
+import os
+
+os.environ["ANONYMIZED_TELEMETRY"] = "false"
 import sys
 import argparse
-import os
+
 import pathlib
 import logging
 
