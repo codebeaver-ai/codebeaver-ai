@@ -11,6 +11,7 @@
 
 [![GitHub license](https://img.shields.io/badge/License-AGPL_3.0-blue.svg)](https://github.com/codebeaver-ai/codebeaver-ai/blob/main/LICENSE)
 [![Discord](https://badgen.net/badge/icon/discord?icon=discord&label&color=purple)](https://discord.gg/4QMwWdsMGt)
+[![Documentation](https://img.shields.io/badge/Documentation-📘-orange)](https://docs.codebeaver.ai)
 <a href="https://github.com/codebeaver-ai/codebeaver-ai/commits/main">
 <img alt="GitHub" src="https://img.shields.io/github/last-commit/codebeaver-ai/codebeaver-ai/main?style=for-the-badge" height="20">
 </a><br>
