@@ -13,7 +13,7 @@ Welcome! We're excited that you want to contribute to CodeBeaver Templates. This
 When adding a new template:
 
 1. Make sure that the framework/language is not already present. Feel free to drop into our [Discord](https://discord.gg/4QMwWdsMGt) if you have any questions.
-2. Read [the documentation about templates](https://docs.codebeaver.ai/configuration#using-templates)
+2. Read [the documentation about templates](https://docs.codebeaver.ai/open-source/codebeaver-yml)
 3. Write a template and test it out (see below for how to test it)
 4. Add the new template file. Try to respect the following naming conventions:
    - {framework}.yml -> `pytest.yml`
@@ -33,7 +33,7 @@ To test your changes, you can:
 - Create a new Open source repository (here on GitHub or on the Git provider you prefer)
 - Use your whole template as the `codebeaver.yml` file for the new repository
 - Put some test code in the repository (or your whole code!)
-- Open a Pull Request or use a [trigger](https://docs.codebeaver.ai/features/triggers) to test it out
+- Open a Pull Request or use a [trigger](https://docs.codebeaver.ai/cloud/features/triggers) to test it out
 
 ## Community
 
