@@ -7,6 +7,10 @@ from codebeaver.CodebeaverConfig import (
     E2ETestConfig,
     UnitTestConfig,
 )
+import pytest
+import tempfile
+import os
+from pathlib import Path
 
 
 class TestCodeBeaverConfig(unittest.TestCase):
@@ -239,5 +243,85 @@ class TestCodeBeaverConfigFixed(unittest.TestCase):
         CodeBeaverConfig.parse_template = original_parse_template
 
 
+class TestCodebeaverConfigPytest:
+    """Pytest based tests to increase coverage of CodeBeaverConfig and related classes."""
+
+    def test_parse_template_file_not_found(self, caplog):
+        """
+        Test that CodeBeaverConfig.parse_template exits with a SystemExit
+        when a nonexistent template is requested.
+        """
+        with pytest.raises(SystemExit):
+            CodeBeaverConfig.parse_template("nonexistent_template")
+        with caplog.at_level(logging.ERROR):
+            with pytest.raises(SystemExit):
+                CodeBeaverConfig.parse_template("nonexistent_template")
+        assert "Could not find" in caplog.text or "Templates directory not found" in caplog.text
+
+    def test_unit_config_unexpected_keyword(self):
+        """
+        Test that UnitTestConfig raises a TypeError when an unexpected keyword argument is provided.
+        """
+        with pytest.raises(TypeError) as excinfo:
+            UnitTestConfig(unknown="value")
+        assert "unexpected keyword argument 'unknown'" in str(excinfo.value)
+
+    def test_from_yaml_without_workspace_name(self):
+        """
+        Test that from_yaml raises a ValueError if workspaces are defined but no workspace_name is provided.
+        """
+        yaml_content = {
+            "workspaces": {
+                "ws1": {
+                    "name": "Workspace1",
+                    "path": "/tmp/ws1",
+                    "unit": {"max_files_to_test": 5},
+                }
+            }
+        }
+        with pytest.raises(ValueError) as excinfo:
+            CodeBeaverConfig.from_yaml(yaml_content)
+        assert "workspace_name is required" in str(excinfo.value)
+
+    def test_get_templates_monkeypatch(self, tmp_path, monkeypatch):
+        """
+        Test that get_templates returns the correct template names using monkeypatched template_dir.
+        """
+        # Create a temporary dummy template file.
+        dummy_template = tmp_path / "dummy_template.yml"
+        dummy_template.write_text("max_attempts: 5")
+        monkeypatch.setattr(CodeBeaverConfig, "template_dir", lambda: tmp_path)
+        templates = CodeBeaverConfig.get_templates()
+        assert "dummy_template" in templates
+
+    def test_codebeaver_config_without_unit(self):
+        """
+        Test that when a YAML does not include a 'unit' section, config.unit remains None.
+        """
+        yaml_content = {
+            "name": "NoUnitWorkspace",
+            "path": "/tmp/nounit",
+            "e2e": {
+                "test": {"url": "http://example.com", "steps": ["step1"]}
+            }
+        }
+        config = CodeBeaverConfig.from_yaml(yaml_content)
+        assert config.unit is None
+
+    def test_unit_config_defaults(self):
+        """
+        Test that a newly instantiated UnitTestConfig has the correct default values.
+        """
+        unit_config = UnitTestConfig()
+        assert unit_config.template is None
+        assert unit_config.main_service is None
+        assert unit_config.services is None
+        assert unit_config.max_files_to_test is None
+        assert unit_config.single_file_test_commands is None
+        assert unit_config.setup_commands is None
+        assert unit_config.test_commands is None
+        assert unit_config.run_setup is True
+        assert unit_config.ignore == []
+        assert unit_config.max_attempts == 4
 if __name__ == "__main__":
     unittest.main()
