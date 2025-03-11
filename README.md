@@ -159,8 +159,8 @@ CodeBeaver currently supports:
 
 ## Resources
 
-- [CodeBeaver Cloud docs](https://docs.codebeaver.ai/getting-started/quickstart)
-- E2E is powered by [BrowserUse](https://github.com/browser-use/browser-use)
+- [Documentation](https://docs.codebeaver.ai/)
+- [E2E is powered by BrowserUse](https://github.com/browser-use/browser-use)
 
 ## Roadmap
 
