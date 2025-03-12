@@ -15,7 +15,7 @@
 <img alt="GitHub" src="https://img.shields.io/github/last-commit/codebeaver-ai/codebeaver-ai/main?style=for-the-badge" height="20">
 </a><br>
 
-CodeBeaver is an open-source testing automation tool that leverages AI to simplify the testing process. It helps developers:
+[CodeBeaver](https://www.codebeaver.ai) is an open-source testing automation tool that leverages AI to simplify the testing process. It helps developers:
 
 - 🤖 **Run end-to-end tests** using natural language descriptions
 - 🧪 **Generate and maintain unit tests** automatically for your codebase
