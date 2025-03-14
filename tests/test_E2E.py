@@ -418,3 +418,224 @@ class TestE2E:
         monkeypatch.setattr(FakeHistory, "final_result", lambda self: 123)
         with pytest.raises(Exception):
             await e2e.run_test(test_obj)
+    @pytest.mark.asyncio
+    async def test_report_xml_written(self, monkeypatch, tmp_path):
+        "Test that run() creates the .codebeaver folder and writes e2e.json and e2e.xml with expected content."
+        monkeypatch.chdir(tmp_path)
+        # Patch Report.generate_xml_report to always return a known XML string.
+        monkeypatch.setattr("codebeaver.E2E.Report.Report.generate_xml_report", lambda self: "fake_xml")
+        # Patch Report.add_e2e_results to a no-op.
+        monkeypatch.setattr("codebeaver.E2E.Report.Report.add_e2e_results", lambda self, tests: None)
+        # Override Agent.run to simulate a successful E2E test.
+        async def fake_run(self):
+            return FakeHistory("normal step")
+        monkeypatch.setattr("codebeaver.E2E.Agent.run", fake_run)
+        tests_dict = {"TestDummy": {"steps": ["step1"], "url": "http://example.com"}}
+        from codebeaver.E2E import E2E  # ensure we use the E2E class
+        e2e = E2E(tests=tests_dict)
+        await e2e.run()
+        # Verify that the .codebeaver directory exists and both files have been written.
+        codebeaver_dir = tmp_path / ".codebeaver"
+        assert codebeaver_dir.exists()
+        e2e_json = codebeaver_dir / "e2e.json"
+        e2e_xml = codebeaver_dir / "e2e.xml"
+        assert e2e_json.exists()
+        assert e2e_xml.exists()
+        with open(e2e_xml, "r") as f:
+            content = f.read()
+        assert content == "fake_xml"
+
+    @pytest.mark.asyncio
+    async def test_gitutils_called(self, monkeypatch):
+        "Test that run_test calls GitUtils.ensure_codebeaver_folder_exists_and_in_gitignore."
+        flag = {"called": False}
+        def fake_gitutils():
+            flag["called"] = True
+        monkeypatch.setattr("codebeaver.E2E.GitUtils.ensure_codebeaver_folder_exists_and_in_gitignore", fake_gitutils)
+        # Override Agent.run to simulate a successful execution.
+        async def fake_run(self):
+            return FakeHistory("normal step")
+        monkeypatch.setattr("codebeaver.E2E.Agent.run", fake_run)
+        from codebeaver.E2E import E2E, End2endTest  # import necessary classes
+        test_obj = End2endTest(name="TestGit", steps=["step1"], url="http://example.com")
+        e2e = E2E(tests={})
+        await e2e.run_test(test_obj)
+        assert flag["called"] is True
+    async def test_run_test_gitutils_exception(self, monkeypatch):
+        """Test that run_test propagates an exception when GitUtils.ensure_codebeaver_folder_exists_and_in_gitignore throws an exception."""
+        monkeypatch.setattr("codebeaver.E2E.GitUtils.ensure_codebeaver_folder_exists_and_in_gitignore", lambda: (_ for _ in ()).throw(Exception("GitUtils error")))
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="TestGitUtilsException", steps=["step1"], url="http://example.com")
+        with pytest.raises(Exception, match="GitUtils error"):
+            await e2e.run_test(test_obj)
+
+    async def test_run_test_whitespace_result(self, monkeypatch):
+        """Test that run_test throws an exception when the agent returns a whitespace string that cannot be parsed as JSON."""
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="TestWhitespaceResult", steps=["step1"], url="http://example.com")
+        monkeypatch.setattr(FakeHistory, "final_result", lambda self: " ")
+        with pytest.raises(Exception):
+            await e2e.run_test(test_obj)
+    async def test_run_test_json_list_result(self, monkeypatch):
+        """Test that run_test raises an exception when agent returns a JSON array instead of a JSON object."""
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="TestJsonList", steps=["simulate_json_list"], url="http://example.com")
+        monkeypatch.setattr(FakeHistory, "final_result", lambda self: json.dumps([{"passed": True, "comment": "Should be JSON object"}]))
+        with pytest.raises(Exception):
+            await e2e.run_test(test_obj)
+    @pytest.mark.asyncio
+    async def test_agent_task_string_empty_steps(self, monkeypatch):
+        """Test that the Agent is initialized with the correct task string when steps is an empty list."""
+        captured_tasks = []
+        original_init = FakeAgent.__init__
+        def new_init(self, task, llm, browser, controller):
+            captured_tasks.append(task)
+            self.llm = llm
+            self.browser = browser
+            self.controller = controller
+        monkeypatch.setattr(FakeAgent, "__init__", new_init)
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="EmptyStepsTask", steps=[], url="http://example.com")
+        # run_test will create an Agent with a task string formed from the URL and the steps.
+        await e2e.run_test(test_obj)
+        expected = f"You are a QA tester. Follow these steps:\n* Go to {test_obj.url}\n"
+        assert captured_tasks[0] == expected
+        monkeypatch.setattr(FakeAgent, "__init__", original_init)
+
+    @pytest.mark.asyncio
+    async def test_run_test_valid_json_with_whitespace(self, monkeypatch):
+        """Test that run_test correctly parses a JSON result wrapped with extra whitespace."""
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="TestWhitespaceJSON", steps=["normal step"], url="http://example.com")
+        whitespace_json = "  " + json.dumps({"passed": True, "comment": "Test succeeded"}) + "  "
+        monkeyatch_backup = FakeHistory.final_result
+        monkeypatch.setattr(FakeHistory, "final_result", lambda self: whitespace_json)
+        result = await e2e.run_test(test_obj)
+        assert result.passed is True
+        assert result.comment == "Test succeeded"
+        assert result.errored is False
+        monkeypatch.setattr(FakeHistory, "final_result", monkeyatch_backup)
+    async def test_run_with_extra_keys_in_test_dict(self, monkeypatch, tmp_path):
+        """Test that run() ignores extra keys in the test dictionary and executes successfully."""
+        monkeypatch.chdir(tmp_path)
+        # Define a test with an extra unexpected key ("unexpected")
+        tests_dict = {
+            "TestExtra": {"steps": ["step1"], "url": "http://example.com", "unexpected": "ignored"}
+        }
+        # Force FakeHistory.final_result to return a passing result with valid JSON.
+        monkeypatch.setattr(FakeHistory, "final_result", lambda self: json.dumps({"passed": True, "comment": "Test succeeded"}))
+        # Override Agent.run to simulate a successful execution.
+        async def fake_run(self):
+            return FakeHistory("normal step")
+        monkeypatch.setattr("codebeaver.E2E.Agent.run", fake_run)
+        e2e = E2E(tests=tests_dict)
+        results = await e2e.run()
+        # Verify that the .codebeaver folder and its e2e.json file are created.
+        e2e_json = tmp_path / ".codebeaver" / "e2e.json"
+        assert e2e_json.exists()
+        # Check that the test result for "TestExtra" is correct.
+        test_result = next((t for t in results if t.name == "TestExtra"), None)
+        assert test_result is not None
+        assert test_result.passed is True
+        assert test_result.comment == "Test succeeded"
+
+    @pytest.mark.asyncio
+    async def test_run_missing_keys_in_test_dict(self, monkeypatch, tmp_path):
+        """Test run() raises KeyError when test dictionary is missing required keys."""
+        monkeypatch.chdir(tmp_path)
+        tests_dict = {"TestMissingKey": {"url": "http://example.com"}}  # missing 'steps'
+        e2e = E2E(tests=tests_dict)
+        with pytest.raises(KeyError):
+            await e2e.run()
+    @pytest.mark.asyncio
+    async def test_run_preserves_order(self, monkeypatch, tmp_path):
+        """Test that E2E.run() returns test results in the same order as the tests dict insertion order."""
+        # Create a tests dict with specific insertion order.
+        tests_dict = {
+            "Alpha": {"steps": ["normal step"], "url": "http://a.com"},
+            "Beta": {"steps": ["normal step"], "url": "http://b.com"}
+        }
+        # Override Agent.run to return a FakeHistory that yields a valid JSON result.
+        def fake_run(self):
+            return FakeHistory("normal step")
+        monkeypatch.setattr("codebeaver.E2E.Agent.run", fake_run)
+        # Change current working directory so that file writes occur in tmp_path.
+        monkeypatch.chdir(tmp_path)
+        e2e = E2E(tests=tests_dict)
+        results = await e2e.run()
+        # Check that the order is preserved.
+        assert len(results) == 2
+        assert results[0].name == "Alpha"
+        assert results[1].name == "Beta"
+    async def test_run_test_final_result_exception(self, monkeypatch):
+        """Test that run_test propagates an exception when history.final_result raises an exception."""
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="TestFinalResultException", steps=["step1"], url="http://example.com")
+        monkeypatch.setattr(FakeHistory, "final_result", lambda self: (_ for _ in ()).throw(Exception("Final result error")))
+        with pytest.raises(Exception, match="Final result error"):
+            await e2e.run_test(test_obj)
+
+    def test_end2endtest_missing_steps(self):
+        """Test that End2endTest raises a validation error when the steps field is missing."""
+        with pytest.raises(Exception):
+            End2endTest(name="NoStepsTest", url="http://example.com")
+
+    @pytest.mark.asyncio
+    async def test_report_add_e2e_results_called(self, monkeypatch, tmp_path):
+        """Test that Report.add_e2e_results() is called with the complete list of test results."""
+        captured_results = []
+        # Patch Report.add_e2e_results to capture its argument.
+        def fake_add_e2e_results(self, tests):
+            captured_results.append(tests)
+        monkeypatch.setattr("codebeaver.E2E.Report.Report.add_e2e_results", fake_add_e2e_results)
+        # Override Agent.run to simulate a successful test.
+        def fake_run(self):
+            return FakeHistory("normal step")
+        monkeypatch.setattr("codebeaver.E2E.Agent.run", fake_run)
+        monkeypatch.chdir(tmp_path)
+        tests_dict = {
+            "TestReport": {"steps": ["normal step"], "url": "http://example.com"}
+        }
+        e2e = E2E(tests=tests_dict)
+        await e2e.run()
+    @pytest.mark.asyncio
+    async def test_report_generate_xml_exception(self, monkeypatch, tmp_path):
+        """Test that run() propagates an exception when Report.generate_xml_report fails."""
+        monkeypatch.chdir(tmp_path)
+        tests_dict = {"TestXMLException": {"steps": ["step1"], "url": "http://example.com"}}
+        e2e = E2E(tests=tests_dict)
+        monkeypatch.setattr("codebeaver.E2E.Report.Report.generate_xml_report", lambda self: (_ for _ in ()).throw(Exception("XML generation error")))
+        with pytest.raises(Exception, match="XML generation error"):
+            await e2e.run()
+        # Verify that add_e2e_results was called exactly once with a list of one test result.
+
+    @pytest.mark.asyncio
+    async def test_non_dict_tests(self):
+        """Test that E2E.run raises an error when tests is not a dict."""
+        e2e = E2E(tests="not a dict")
+        with pytest.raises(AttributeError):
+            await e2e.run()
+        assert len(captured_results) == 1
+        assert isinstance(captured_results[0], list)
+        assert len(captured_results[0]) == 1
+        assert captured_results[0][0].name == "TestReport"
+    async def test_run_test_empty_string_in_steps(self, monkeypatch):
+        """Test run_test with a step list that contains an empty string.
+        This verifies that missing step text does not prevent a successful test outcome.
+        """
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="TestEmptyStringStep", steps=[""], url="http://example.com")
+        result = await e2e.run_test(test_obj)
+        assert result.passed is True
+        assert result.comment == "Test succeeded"
+        assert result.errored is False
+
+    async def test_run_test_browser_init_exception(self, monkeypatch):
+        """Test that run_test propagates an exception when the Browser initialization fails.
+        This simulates a failure during the creation of a Browser object.
+        """
+        monkeypatch.setattr("codebeaver.E2E.Browser", lambda config: (_ for _ in ()).throw(Exception("Browser init error")))
+        e2e = E2E(tests={})
+        test_obj = End2endTest(name="TestBrowserInitException", steps=["step1"], url="http://example.com")
+        with pytest.raises(Exception, match="Browser init error"):
+            await e2e.run_test(test_obj)
