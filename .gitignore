@@ -175,3 +175,6 @@ cython_debug/
 .report.json
 .env
 .DS_Store
+
+# CodeBeaver reports and artifacts
+.codebeaver/
