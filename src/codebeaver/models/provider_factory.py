@@ -6,12 +6,14 @@ from .anthropic import AnthropicProvider
 from .deepseek import DeepSeekProvider
 from .ollama import OllamaProvider
 
+
 class ProviderType(Enum):
     MISTRAL = "mistral"
     OPENAI = "openai"
     ANTHROPIC = "anthropic"
     DEEPSEEK = "deepseek"
     OLLAMA = "ollama"
+
 
 class ProviderFactory:
     @staticmethod
@@ -27,4 +29,4 @@ class ProviderFactory:
         elif provider_type == ProviderType.OLLAMA:
             return OllamaProvider()
         else:
-            raise ValueError(f"Unknown provider type: {provider_type}") 
+            raise ValueError(f"Unknown provider type: {provider_type}")

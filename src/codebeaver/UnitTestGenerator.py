@@ -5,7 +5,7 @@ from .models.provider_factory import ProviderFactory, ProviderType
 from pathlib import Path
 import logging
 
-logger = logging.getLogger('codebeaver')
+logger = logging.getLogger("codebeaver")
 
 
 class UnitTestGenerator:
@@ -13,6 +13,9 @@ class UnitTestGenerator:
         self.file_path = file_path
         provider_type = os.getenv("CODEBEAVER_PROVIDER", "openai")
         self.provider = ProviderFactory.get_provider(ProviderType(provider_type))
+        self.context_window = self.provider.get_model_info(self.provider.model)[
+            "context_window"
+        ]
 
     def generate_test(self, test_file_path: Path | None = None, console: str = ""):
         """
