@@ -59,7 +59,7 @@ Last console output:
     Import the original source code and use it in the test.
     Imports must cover the entire code of the new test, otherwise the test will fail. If you can't import something, mock it.
     If there is an existing test class, write the new test in the same class.
-    Wrap the new imports and the test function in a ```test block.
+    Wrap the new imports and the test function in a <test> [test] </test> block.
     If you want to keep parts of the existing test file content, use a comment that starts with "... existing code" when writing new code.
 
     Add a docstring to the test to explain what the test is doing.
