@@ -166,11 +166,11 @@ CodeBeaver currently supports:
 
 - [✅] Unit tests
 - [✅] E2E Tests
+- [✅] Add support for more models (thank you [VinciGit00](https://github.com/VinciGit00)!)
 - [ ] Better reporting
 - [ ] Integration Tests
 - [ ] Unit Tests: Add support for more languages and frameworks
 - [ ] Unit Tests: Add support for more testing frameworks
-- [ ] Add support for more models
 
 ## Let's chat!
 

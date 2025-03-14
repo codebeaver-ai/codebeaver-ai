@@ -5,32 +5,17 @@ from browser_use.browser.browser import Browser, BrowserConfig
 from browser_use.browser.context import BrowserContext
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
-from pydantic import BaseModel
+
 from .GitUtils import GitUtils
 import logging
 from browser_use.browser.context import BrowserContextConfig
 from pathlib import Path
+from .types import End2endTest, TestCase
+from .Report import Report
 
 load_dotenv()
 
 logger = logging.getLogger("codebeaver")
-
-
-class End2endTest(BaseModel):
-    steps: list[str]
-    url: str
-    passed: bool = False
-    errored: bool = False
-    comment: str = ""
-    name: str
-
-    def __init__(self, name: str, steps: list[str], url: str):
-        super().__init__(name=name, steps=steps, url=url)
-
-
-class TestCase(BaseModel):
-    passed: bool
-    comment: str
 
 
 controller = Controller(output_model=TestCase)
@@ -65,6 +50,10 @@ class E2E:
         # write the results to e2e.json. this is temporary, we will eventually use the report class
         with open(Path.cwd() / ".codebeaver/e2e.json", "w") as f:
             json.dump([test.model_dump() for test in all_tests], f)
+        report = Report()
+        report.add_e2e_results(all_tests)
+        with open(Path.cwd() / ".codebeaver/e2e.xml", "w") as f:
+            f.write(report.generate_xml_report())
         return all_tests
 
     async def run_test(self, test: End2endTest) -> End2endTest:
@@ -86,7 +75,6 @@ class E2E:
 """
             + "\n".join(f"* {step}" for step in test.steps),
             llm=ChatOpenAI(model="gpt-4o"),
-            # browser=browser,
             controller=controller,
             browser_context=context,
         )

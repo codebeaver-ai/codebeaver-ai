@@ -1,7 +1,8 @@
 from codebeaver.types import TestErrorType
-import openai
+import os
 from pathlib import Path
 import logging
+from .models.provider_factory import ProviderFactory, ProviderType
 
 logger = logging.getLogger("codebeaver")
 
@@ -40,6 +41,8 @@ class AnalyzeError:
 ---ERROR LOG---
 {error}
 """
+        provider_type = os.getenv("CODEBEAVER_PROVIDER", "openai")
+        self.provider = ProviderFactory.get_provider(ProviderType(provider_type))
 
     def analyze(self) -> tuple[TestErrorType, str | None]:
         """
@@ -51,8 +54,7 @@ class AnalyzeError:
         if self.error == "exit status 1":
             return TestErrorType.TEST, self.error
 
-        response = openai.chat.completions.create(
-            model="o3-mini",
+        response = self.provider.create_chat_completion(
             messages=[
                 {
                     "role": "user",
