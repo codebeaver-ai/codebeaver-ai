@@ -1,6 +1,7 @@
-import openai
+import os
 from .ResponseParser import ResponseParser
 from .ContentCleaner import ContentCleaner
+from .models.provider_factory import ProviderFactory, ProviderType
 from pathlib import Path
 import logging
 
@@ -10,6 +11,8 @@ logger = logging.getLogger('codebeaver')
 class UnitTestGenerator:
     def __init__(self, file_path: Path) -> None:
         self.file_path = file_path
+        provider_type = os.getenv("CODEBEAVER_PROVIDER", "openai")
+        self.provider = ProviderFactory.get_provider(ProviderType(provider_type))
 
     def generate_test(self, test_file_path: Path | None = None, console: str = ""):
         """
@@ -66,8 +69,7 @@ Last console output:
     """
         logger.debug("PROMPT:")
         logger.debug(prompt)
-        response = openai.chat.completions.create(
-            model="o3-mini",
+        response = self.provider.create_chat_completion(
             messages=[{"role": "user", "content": prompt}],
             max_completion_tokens=100000,
         )
