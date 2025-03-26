@@ -21,5 +21,6 @@ class End2endTest(BaseModel):
 
 
 class TestCase(BaseModel):
-    passed: bool
+    failure: bool
     comment: str
+    errored: bool = False
