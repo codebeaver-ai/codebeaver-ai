@@ -1,3 +1,10 @@
+## [0.1.2] - 2025-03-26
+
+### Added
+
+- Added a new command `codebeaver e2e` to run end-to-end tests defined in configuration
+- Added XML report generation for end-to-end tests
+
 ## [0.1.0] - 2024-03-10
 
 ### Added
