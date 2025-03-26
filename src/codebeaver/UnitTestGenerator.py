@@ -1,15 +1,21 @@
-import openai
+import os
 from .ResponseParser import ResponseParser
 from .ContentCleaner import ContentCleaner
+from .models.provider_factory import ProviderFactory, ProviderType
 from pathlib import Path
 import logging
 
-logger = logging.getLogger('codebeaver')
+logger = logging.getLogger("codebeaver")
 
 
 class UnitTestGenerator:
     def __init__(self, file_path: Path) -> None:
         self.file_path = file_path
+        provider_type = os.getenv("CODEBEAVER_PROVIDER", "openai")
+        self.provider = ProviderFactory.get_provider(ProviderType(provider_type))
+        self.context_window = self.provider.get_model_info(self.provider.model)[
+            "context_window"
+        ]
 
     def generate_test(self, test_file_path: Path | None = None, console: str = ""):
         """
@@ -59,15 +65,14 @@ Last console output:
     Import the original source code and use it in the test.
     Imports must cover the entire code of the new test, otherwise the test will fail. If you can't import something, mock it.
     If there is an existing test class, write the new test in the same class.
-    Wrap the new imports and the test function in a ```test block.
+    Wrap the new imports and the test function in a <test> [test] </test> block.
     If you want to keep parts of the existing test file content, use a comment that starts with "... existing code" when writing new code.
 
     Add a docstring to the test to explain what the test is doing.
     """
         logger.debug("PROMPT:")
         logger.debug(prompt)
-        response = openai.chat.completions.create(
-            model="o3-mini",
+        response = self.provider.create_chat_completion(
             messages=[{"role": "user", "content": prompt}],
             max_completion_tokens=100000,
         )

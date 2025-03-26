@@ -5,32 +5,17 @@ from browser_use.browser.browser import Browser, BrowserConfig
 from browser_use.browser.context import BrowserContext
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
-from pydantic import BaseModel
+
 from .GitUtils import GitUtils
 import logging
 from browser_use.browser.context import BrowserContextConfig
 from pathlib import Path
+from .types import End2endTest, TestCase
+from .Report import Report
 
 load_dotenv()
 
 logger = logging.getLogger("codebeaver")
-
-
-class End2endTest(BaseModel):
-    steps: list[str]
-    url: str
-    passed: bool = False
-    errored: bool = False
-    comment: str = ""
-    name: str
-
-    def __init__(self, name: str, steps: list[str], url: str):
-        super().__init__(name=name, steps=steps, url=url)
-
-
-class TestCase(BaseModel):
-    passed: bool
-    comment: str
 
 
 controller = Controller(output_model=TestCase)
@@ -61,13 +46,20 @@ class E2E:
                 url=test["url"],
             )
             test_result = await self.run_test(test)
-            all_tests.append(test_result)
+            test.passed = not test_result.failure
+            test.errored = test_result.errored
+            test.comment = test_result.comment
+            all_tests.append(test)
         # write the results to e2e.json. this is temporary, we will eventually use the report class
         with open(Path.cwd() / ".codebeaver/e2e.json", "w") as f:
             json.dump([test.model_dump() for test in all_tests], f)
+        report = Report()
+        report.add_e2e_results(all_tests)
+        with open(Path.cwd() / ".codebeaver/e2e.xml", "w") as f:
+            f.write(report.generate_xml_report())
         return all_tests
 
-    async def run_test(self, test: End2endTest) -> End2endTest:
+    async def run_test(self, test: End2endTest) -> TestCase:
         GitUtils.ensure_codebeaver_folder_exists_and_in_gitignore()  # avoid committing logs, screenshots and so on
         config_context = BrowserContextConfig(
             save_recording_path=Path.cwd() / ".codebeaver/",
@@ -81,12 +73,12 @@ class E2E:
         )
         context = BrowserContext(browser=browser, config=config_context)
         agent = Agent(
-            task=f"""You are a QA tester. Follow these steps:
+            task=f"""You are a QA tester. Follow these instructions to perform the test called {test.name}:
 * Go to {test.url}
 """
-            + "\n".join(f"* {step}" for step in test.steps),
+            + "\n".join(f"* {step}" for step in test.steps)
+            + "\n\nIf any step that starts with 'Check' fails, the result is a failure",
             llm=ChatOpenAI(model="gpt-4o"),
-            # browser=browser,
             controller=controller,
             browser_context=context,
         )
@@ -94,11 +86,9 @@ class E2E:
         await context.close()
         result = history.final_result()
         if result:
-            parsed: TestCase = TestCase.model_validate_json(result)
-            test.passed = parsed.passed
-            test.comment = parsed.comment
-            return test
+            test_result: TestCase = TestCase.model_validate_json(result)
+            return test_result
         else:
-            test.errored = True
-            test.comment = "No result from the test"
-            return test
+            test_result.errored = True
+            test_result.comment = "No result from the test"
+            return test_result
