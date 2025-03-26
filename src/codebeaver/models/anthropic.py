@@ -3,6 +3,7 @@ from typing import List, Dict, Any
 import openai
 from enum import Enum
 
+
 class ClaudeModel(Enum):
     # Latest models with aliases
     CLAUDE_3_7_SONNET = "claude-3-7-sonnet-20250219"
@@ -17,12 +18,13 @@ class ClaudeModel(Enum):
     CLAUDE_3_SONNET = "claude-3-sonnet-20240229"
     CLAUDE_3_HAIKU = "claude-3-haiku-20240307"
 
+
 class AnthropicProvider:
     def __init__(self, model: str = ClaudeModel.CLAUDE_3_5_SONNET_V2.value):
         self.api_key = os.getenv("ANTHROPIC_API_KEY")
         if not self.api_key:
             raise ValueError("ANTHROPIC_API_KEY environment variable not set")
-        
+
         openai.api_key = self.api_key
         openai.api_base = "https://api.anthropic.com/v1"
         self.model = model
@@ -32,12 +34,17 @@ class AnthropicProvider:
             ClaudeModel(model)
         except ValueError:
             valid_models = [m.value for m in ClaudeModel]
-            raise ValueError(f"Invalid model: {model}. Valid models are: {valid_models}")
+            raise ValueError(
+                f"Invalid model: {model}. Valid models are: {valid_models}"
+            )
 
     def create_chat_completion(self, messages: List[Dict[str, str]], **kwargs) -> Any:
         try:
             # Handle extended thinking for Claude 3.7 Sonnet
-            if self.model in [ClaudeModel.CLAUDE_3_7_SONNET.value, ClaudeModel.CLAUDE_3_7_SONNET_LATEST.value]:
+            if self.model in [
+                ClaudeModel.CLAUDE_3_7_SONNET.value,
+                ClaudeModel.CLAUDE_3_7_SONNET_LATEST.value,
+            ]:
                 if kwargs.get("extended_thinking", False):
                     kwargs["headers"] = kwargs.get("headers", {})
                     kwargs["headers"]["output-128k-2025-02-19"] = "true"
@@ -45,9 +52,7 @@ class AnthropicProvider:
                     kwargs.pop("extended_thinking", None)
 
             response = openai.ChatCompletion.create(
-                model=self.model,
-                messages=messages,
-                **kwargs
+                model=self.model, messages=messages, **kwargs
             )
             return response
         except Exception as e:
@@ -97,13 +102,24 @@ class AnthropicProvider:
             },
             # Add other models with their respective information
         }
-        
+
         try:
             model_enum = ClaudeModel(model)
             # Handle latest aliases
             if model_enum.name.endswith("_LATEST"):
-                base_model = model_enum.value.replace("-latest", model_info[next(m.value for m in ClaudeModel if not m.name.endswith("_LATEST") and m.value.split("-")[1] == model_enum.value.split("-")[1])])
-                return model_info.get(base_model, {"description": "Latest version of the model"})
-            return model_info.get(model, {"description": "Model information not available"})
+                # First, find the corresponding non-latest model name
+                base_model_name = next(
+                    m.value
+                    for m in ClaudeModel
+                    if not m.name.endswith("_LATEST")
+                    and m.value.split("-")[1] == model_enum.value.split("-")[1]
+                )
+                # Then look up the model info using the base model name
+                return model_info.get(
+                    base_model_name, {"description": "Latest version of the model"}
+                )
+            return model_info.get(
+                model, {"description": "Model information not available"}
+            )
         except ValueError:
             raise ValueError(f"Invalid model: {model}")
