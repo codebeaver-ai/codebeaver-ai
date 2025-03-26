@@ -1,0 +1,428 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="14" skipped="28" tests="150" time="15.340" timestamp="2025-03-26T15:07:08.412214+00:00" hostname="82a9085da74b"><testcase classname="tests.test_CodebeaverConfig.TestCodeBeaverConfig" name="test_e2e_config_instance_conversion" time="0.003" /><testcase classname="tests.test_CodebeaverConfig.TestCodeBeaverConfig" name="test_e2e_conversion_and_unit_max_attempts_template_merge" time="0.002" /><testcase classname="tests.test_CodebeaverConfig.TestCodeBeaverConfig" name="test_from_yaml_with_workspace" time="0.002" /><testcase classname="tests.test_CodebeaverConfig.TestCodeBeaverConfig" name="test_from_yaml_without_workspaces" time="0.002" /><testcase classname="tests.test_CodebeaverConfig.TestCodeBeaverConfig" name="test_unit_config_template_merge" time="0.002" /><testcase classname="tests.test_CodebeaverConfig.TestCodeBeaverConfigFixed" name="test_e2e_config_conversion_after_init" time="0.002" /><testcase classname="tests.test_CodebeaverConfig.TestCodeBeaverConfigFixed" name="test_unit_config_max_attempts_merge_fix" time="0.002" /><testcase classname="tests.test_ContentCleaner" name="test_get_and_set_supported_languages" time="0.001" /><testcase classname="tests.test_ContentCleaner" name="test_merge_files_python" time="0.012" /><testcase classname="tests.test_ContentCleaner" name="test_merge_files_invalid_language" time="0.532" /><testcase classname="tests.test_ContentCleaner" name="test_clean_python" time="0.003" /><testcase classname="tests.test_ContentCleaner" name="test_merge_python_files_valid" time="0.008" /><testcase classname="tests.test_ContentCleaner" name="test_merge_python_files_invalid" time="0.002" /><testcase classname="tests.test_ContentCleaner" name="test_clean_typescript" time="0.002" /><testcase classname="tests.test_ContentCleaner" name="test_merge_typescript_files" time="0.001" /><testcase classname="tests.test_ContentCleaner" name="test_merge_files_javascript_keyerror" time="0.002" /><testcase classname="tests.test_ContentCleaner" name="test_merge_files_javascript_valid" time="0.002" /><testcase classname="tests.test_ContentCleaner" name="test_merge_typescript_files_exception" time="0.002" /><testcase classname="tests.test_ContentCleaner" name="test_merge_typescript_files_tsx" time="0.002" /><testcase classname="tests.test_ContentCleaner" name="test_clean_python_empty" time="0.001" /><testcase classname="tests.test_ContentCleaner" name="test_clean_typescript_empty" time="0.001" /><testcase classname="tests.test_ContentCleaner" name="test_clean_python_multiline_import" time="0.002" /><testcase classname="tests.test_ContentCleaner" name="test_merge_files_file2_none" time="0.002" /><testcase classname="tests.test_ContentCleaner" name="test_clean_typescript_multiline_import" time="0.001" /><testcase classname="tests.test_ContentCleaner" name="test_merge_python_files_try_block" time="0.008" /><testcase classname="tests.test_E2E.TestE2E" name="test_run_test_success" time="0.002"><skipped type="pytest.skip" message="async def function and no async plugin installed (see warnings)">/usr/local/lib/python3.11/site-packages/_pytest/python.py:149: async def function and no async plugin installed (see warnings)</skipped></testcase><testcase classname="tests.test_E2E.TestE2E" name="test_run_test_failure" time="0.002"><skipped type="pytest.skip" message="async def function and no async plugin installed (see warnings)">/usr/local/lib/python3.11/site-packages/_pytest/python.py:149: async def function and no async plugin installed (see warnings)</skipped></testcase><testcase classname="tests.test_E2E.TestE2E" name="test_run_test_no_result" time="0.002"><skipped type="pytest.skip" message="async def function and no async plugin installed (see warnings)">/usr/local/lib/python3.11/site-packages/_pytest/python.py:149: async def function and no async plugin installed (see warnings)</skipped></testcase><testcase classname="tests.test_E2E.TestE2E" name="test_run_test_empty_string" time="0.002"><skipped type="pytest.skip" message="async def function and no async plugin installed (see warnings)">/usr/local/lib/python3.11/site-packages/_pytest/python.py:149: async def function and no async plugin installed (see warnings)</skipped></testcase><testcase classname="tests.test_E2E.TestE2E" name="test_run_overall" time="0.007"><skipped type="pytest.skip" message="async def function and no async plugin installed (see warnings)">/usr/local/lib/python3.11/site-packages/_pytest/python.py:149: async def function and no async plugin installed (see warnings)</skipped></testcase><testcase classname="tests.test_E2E.TestE2E" name="test_env_variable" time="0.002"><skipped type="pytest.skip" message="async def function and no async plugin installed (see warnings)">/usr/local/lib/python3.11/site-packages/_pytest/python.py:149: async def function and no async plugin installed (see warnings)</skipped></testcase><testcase classname="tests.test_E2E.TestE2E" name="test_run_empty_tests" time="0.005"><skipped type="pytest.skip" message="async def function and no async plugin installed (see warnings)">/usr/local/lib/python3.11/site-packages/_pytest/python.py:149: async def function and no async plugin installed (see warnings)</skipped></testcase><testcase classname="tests.test_E2E.TestE2E" name="test_run_test_invalid_result" time="0.002"><skipped type="pytest.skip" message="async def function and no async plugin installed (see warnings)">/usr/local/lib/python3.11/site-packages/_pytest/python.py:149: async def function and no async plugin installed (see warnings)</skipped></testcase><testcase classname="tests.test_E2E.TestE2E" name="test_run_test_agent_exception" time="0.002"><skipped type="pytest.skip" message="async def function and no async plugin installed (see warnings)">/usr/local/lib/python3.11/site-packages/_pytest/python.py:149: async def function and no async plugin installed (see warnings)</skipped></testcase><testcase classname="tests.test_E2E.TestE2E" name="test_run_test_empty_steps" time="0.002"><skipped type="pytest.skip" message="async def function and no async plugin installed (see warnings)">/usr/local/lib/python3.11/site-packages/_pytest/python.py:149: async def function and no async plugin installed (see warnings)</skipped></testcase><testcase classname="tests.test_E2E.TestE2E" name="test_browser_close_exception" time="0.002"><skipped type="pytest.skip" message="async def function and no async plugin installed (see warnings)">/usr/local/lib/python3.11/site-packages/_pytest/python.py:149: async def function and no async plugin installed (see warnings)</skipped></testcase><testcase classname="tests.test_E2E.TestE2E" name="test_agent_task_string" time="0.002"><skipped type="pytest.skip" message="async def function and no async plugin installed (see warnings)">/usr/local/lib/python3.11/site-packages/_pytest/python.py:149: async def function and no async plugin installed (see warnings)</skipped></testcase><testcase classname="tests.test_E2E.TestE2E" name="test_end2endtest_defaults" time="0.002"><skipped type="pytest.skip" message="async def function and no async plugin installed (see warnings)">/usr/local/lib/python3.11/site-packages/_pytest/python.py:149: async def function and no async plugin installed (see warnings)</skipped></testcase><testcase classname="tests.test_E2E.TestE2E" name="test_browser_closed_called" time="0.002"><skipped type="pytest.skip" message="async def function and no async plugin installed (see warnings)">/usr/local/lib/python3.11/site-packages/_pytest/python.py:149: async def function and no async plugin installed (see warnings)</skipped></testcase><testcase classname="tests.test_E2E.TestE2E" name="test_run_test_missing_field" time="0.002"><skipped type="pytest.skip" message="async def function and no async plugin installed (see warnings)">/usr/local/lib/python3.11/site-packages/_pytest/python.py:149: async def function and no async plugin installed (see warnings)</skipped></testcase><testcase classname="tests.test_E2E.TestE2E" name="test_run_test_extra_keys_ignored" time="0.002"><skipped type="pytest.skip" message="async def function and no async plugin installed (see warnings)">/usr/local/lib/python3.11/site-packages/_pytest/python.py:149: async def function and no async plugin installed (see warnings)</skipped></testcase><testcase classname="tests.test_E2E.TestE2E" name="test_run_file_write_exception" time="0.002"><skipped type="pytest.skip" message="async def function and no async plugin installed (see warnings)">/usr/local/lib/python3.11/site-packages/_pytest/python.py:149: async def function and no async plugin installed (see warnings)</skipped></testcase><testcase classname="tests.test_E2E.TestE2E" name="test_default_chrome_instance_path" time="0.002"><skipped type="pytest.skip" message="async def function and no async plugin installed (see warnings)">/usr/local/lib/python3.11/site-packages/_pytest/python.py:149: async def function and no async plugin installed (see warnings)</skipped></testcase><testcase classname="tests.test_E2E.TestE2E" name="test_run_overall_multiple_tests" time="0.004"><skipped type="pytest.skip" message="async def function and no async plugin installed (see warnings)">/usr/local/lib/python3.11/site-packages/_pytest/python.py:149: async def function and no async plugin installed (see warnings)</skipped></testcase><testcase classname="tests.test_E2E.TestE2E" name="test_agent_task_string_multiple_steps" time="0.002"><skipped type="pytest.skip" message="async def function and no async plugin installed (see warnings)">/usr/local/lib/python3.11/site-packages/_pytest/python.py:149: async def function and no async plugin installed (see warnings)</skipped></testcase><testcase classname="tests.test_E2E.TestE2E" name="test_agent_task_string_with_long_steps" time="0.003"><skipped type="pytest.skip" message="async def function and no async plugin installed (see warnings)">/usr/local/lib/python3.11/site-packages/_pytest/python.py:149: async def function and no async plugin installed (see warnings)</skipped></testcase><testcase classname="tests.test_E2E.TestE2E" name="test_browser_config_usage" time="0.002"><skipped type="pytest.skip" message="async def function and no async plugin installed (see warnings)">/usr/local/lib/python3.11/site-packages/_pytest/python.py:149: async def function and no async plugin installed (see warnings)</skipped></testcase><testcase classname="tests.test_E2E.TestE2E" name="test_end2endtest_invalid_step_type" time="0.002" /><testcase classname="tests.test_E2E.TestE2E" name="test_end2endtest_model_dump_output" time="0.002" /><testcase classname="tests.test_E2E.TestE2E" name="test_logging_in_run" time="0.002"><skipped type="pytest.skip" message="async def function and no async plugin installed (see warnings)">/usr/local/lib/python3.11/site-packages/_pytest/python.py:149: async def function and no async plugin installed (see warnings)</skipped></testcase><testcase classname="tests.test_E2E.TestE2E" name="test_all_tests_pass_summary" time="0.004"><skipped type="pytest.skip" message="async def function and no async plugin installed (see warnings)">/usr/local/lib/python3.11/site-packages/_pytest/python.py:149: async def function and no async plugin installed (see warnings)</skipped></testcase><testcase classname="tests.test_E2E.TestE2E" name="test_all_tests_fail_summary" time="0.004"><skipped type="pytest.skip" message="async def function and no async plugin installed (see warnings)">/usr/local/lib/python3.11/site-packages/_pytest/python.py:149: async def function and no async plugin installed (see warnings)</skipped></testcase><testcase classname="tests.test_E2E.TestE2E" name="test_all_tests_mixed_summary" time="0.004"><skipped type="pytest.skip" message="async def function and no async plugin installed (see warnings)">/usr/local/lib/python3.11/site-packages/_pytest/python.py:149: async def function and no async plugin installed (see warnings)</skipped></testcase><testcase classname="tests.test_E2E.TestE2E" name="test_run_slow_agent" time="0.002"><skipped type="pytest.skip" message="async def function and no async plugin installed (see warnings)">/usr/local/lib/python3.11/site-packages/_pytest/python.py:149: async def function and no async plugin installed (see warnings)</skipped></testcase><testcase classname="tests.test_E2E.TestE2E" name="test_run_test_non_string_result" time="0.002"><skipped type="pytest.skip" message="async def function and no async plugin installed (see warnings)">/usr/local/lib/python3.11/site-packages/_pytest/python.py:149: async def function and no async plugin installed (see warnings)</skipped></testcase><testcase classname="tests.test_ResponseParser.TestResponseParser" name="test_parse[&lt;test&gt;[test]Hello, World!&lt;/test&gt;-Hello, World!]" time="0.003" /><testcase classname="tests.test_ResponseParser.TestResponseParser" name="test_parse[No test block here-]" time="0.002" /><testcase classname="tests.test_ResponseParser.TestResponseParser" name="test_parse[&lt;test&gt;[test]First&lt;/test&gt;&lt;test&gt;[test]Second&lt;/test&gt;-First]" time="0.002" /><testcase classname="tests.test_ResponseParser.TestResponseParser" name="test_parse[&lt;test&gt;[test]  Whitespace  &lt;/test&gt;-Whitespace]" time="0.002" /><testcase classname="tests.test_ResponseParser.TestResponseParser" name="test_parse[-]" time="0.002" /><testcase classname="tests.test_ResponseParser.TestResponseParser" name="test_parse[&lt;test&gt;[test]Outer&lt;test&gt;[test]Inner&lt;/test&gt;&lt;/test&gt;-Outer&lt;test&gt;[test]Inner]" time="0.002" /><testcase classname="tests.test_ResponseParser.TestResponseParser" name="test_parse_with_multiline_content" time="0.001" /><testcase classname="tests.test_ResponseParser.TestResponseParser" name="test_parse_with_special_characters" time="0.001" /><testcase classname="tests.test_ResponseParser.TestResponseParser" name="test_parse_with_large_input" time="0.051" /><testcase classname="tests.test_ResponseParser.TestResponseParser" name="test_parse_with_malformed_tags" time="0.001" /><testcase classname="tests.test_ResponseParser.TestResponseParser" name="test_parse_with_invalid_input_types[None]" time="0.002" /><testcase classname="tests.test_ResponseParser.TestResponseParser" name="test_parse_with_invalid_input_types[123]" time="0.002" /><testcase classname="tests.test_ResponseParser.TestResponseParser" name="test_parse_with_invalid_input_types[input_response2]" time="0.002" /><testcase classname="tests.test_ResponseParser.TestResponseParser" name="test_parse_with_invalid_input_types[input_response3]" time="0.002" /><testcase classname="tests.test_ResponseParser.TestResponseParser" name="test_parse_with_nested_test_blocks" time="0.001" /><testcase classname="tests.test_ResponseParser.TestResponseParser" name="test_parse_with_multiple_test_blocks" time="0.001" /><testcase classname="tests.test_ResponseParser.TestResponseParser" name="test_parse_with_empty_test_block" time="0.001" /><testcase classname="tests.test_ResponseParser.TestResponseParser" name="test_parse_with_whitespace_only_test_block" time="0.001" /><testcase classname="tests.test_TestRunner.TestTestRunner" name="test_setup" time="0.002"><failure message="TypeError: TestTestRunner.test_setup.&lt;locals&gt;.fake_run() got an unexpected keyword argument 'capture_output'">self = &lt;tests.test_TestRunner.TestTestRunner object at 0x7fa6e2d31350&gt;
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fa6e24afcd0&gt;
+
+    def test_setup(self, monkeypatch):
+        """Test that the setup method constructs and runs the correct command."""
+        # Prepare a dummy result for subprocess.run
+        dummy_result = subprocess.CompletedProcess(args="dummy", returncode=0)
+    
+        def fake_run(command, shell, cwd):
+            # Verify the command is constructed properly using the setup commands.
+            assert command == "echo setup1 &amp;&amp; echo setup2"
+            return dummy_result
+    
+        monkeypatch.setattr(subprocess, "run", fake_run)
+    
+        runner = UnitTestRunner(single_file_test_commands=[], setup_commands=["echo setup1", "echo setup2"])
+&gt;       result = runner.setup()
+
+tests/test_TestRunner.py:22: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;codebeaver.UnitTestRunner.UnitTestRunner object at 0x7fa6e24b8290&gt;
+
+    def setup(self) -&gt; subprocess.CompletedProcess:
+        commands = self.setup_commands.copy()
+        command = " &amp;&amp; ".join(commands)
+&gt;       setup_result = subprocess.run(command, shell=True, cwd=pathlib.Path.cwd(), capture_output=True, text=True)
+E       TypeError: TestTestRunner.test_setup.&lt;locals&gt;.fake_run() got an unexpected keyword argument 'capture_output'
+
+src/codebeaver/UnitTestRunner.py:17: TypeError</failure></testcase><testcase classname="tests.test_TestRunner.TestTestRunner" name="test_run_test" time="0.003"><failure message="TypeError: TestTestRunner.test_run_test.&lt;locals&gt;.fake_run() got an unexpected keyword argument 'capture_output'">self = &lt;tests.test_TestRunner.TestTestRunner object at 0x7fa6e2d31b50&gt;
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fa6e24e2790&gt;
+capsys = &lt;_pytest.capture.CaptureFixture object at 0x7fa6e24e0fd0&gt;
+
+    def test_run_test(self, monkeypatch, capsys):
+        """Test that run_test executes the correct command with proper exported variables."""
+        # Prepare a dummy result for subprocess.run
+        dummy_result = subprocess.CompletedProcess(args="dummy", returncode=0)
+    
+        recorded_command = []
+    
+        def fake_run(command, shell, cwd):
+            recorded_command.append(command)
+            return dummy_result
+    
+        monkeypatch.setattr(subprocess, "run", fake_run)
+    
+        runner = UnitTestRunner(single_file_test_commands=["echo test", "exit 0"], setup_commands=[])
+        source_file = "src/main.py"
+        test_file = "tests/test_main.py"
+&gt;       result = runner.run_test(source_file, test_file)
+
+tests/test_TestRunner.py:41: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;codebeaver.UnitTestRunner.UnitTestRunner object at 0x7fa6ead58290&gt;
+source_file_path = 'src/main.py', test_file_path = 'tests/test_main.py'
+
+    def run_test(
+        self, source_file_path: Path, test_file_path: Path
+    ) -&gt; subprocess.CompletedProcess:
+        commands = self.single_file_test_commands.copy()
+        commands.insert(0, f"export FILE_TO_COVER='{source_file_path}'")
+        commands.insert(0, f"export TEST_FILE='{test_file_path}'")
+        command = " &amp;&amp; ".join(commands)
+    
+        logger.debug(f"UnitTestRunner: {command}")
+&gt;       test_result = subprocess.run(
+            command,
+            shell=True,
+            cwd=pathlib.Path.cwd(),
+            capture_output=True,
+            text=True
+        )
+E       TypeError: TestTestRunner.test_run_test.&lt;locals&gt;.fake_run() got an unexpected keyword argument 'capture_output'
+
+src/codebeaver/UnitTestRunner.py:33: TypeError</failure></testcase><testcase classname="tests.test_TestRunner.TestTestRunner" name="test_run_test_empty_commands" time="0.003"><failure message="TypeError: TestTestRunner.test_run_test_empty_commands.&lt;locals&gt;.fake_run() got an unexpected keyword argument 'capture_output'">self = &lt;tests.test_TestRunner.TestTestRunner object at 0x7fa6e2f1bc50&gt;
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fa6e24bbbd0&gt;
+capsys = &lt;_pytest.capture.CaptureFixture object at 0x7fa6e24bbdd0&gt;
+
+    def test_run_test_empty_commands(self, monkeypatch, capsys):
+        """Test run_test behavior when single_file_test_commands is empty."""
+        dummy_result = subprocess.CompletedProcess(args="", returncode=0)
+    
+        recorded_command = []
+    
+        def fake_run(command, shell, cwd):
+            recorded_command.append(command)
+            return dummy_result
+    
+        monkeypatch.setattr(subprocess, "run", fake_run)
+    
+        runner = UnitTestRunner(single_file_test_commands=[], setup_commands=[])
+        source_file = "src/empty.py"
+        test_file = "tests/empty_test.py"
+&gt;       result = runner.run_test(source_file, test_file)
+
+tests/test_TestRunner.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;codebeaver.UnitTestRunner.UnitTestRunner object at 0x7fa6e24bbf50&gt;
+source_file_path = 'src/empty.py', test_file_path = 'tests/empty_test.py'
+
+    def run_test(
+        self, source_file_path: Path, test_file_path: Path
+    ) -&gt; subprocess.CompletedProcess:
+        commands = self.single_file_test_commands.copy()
+        commands.insert(0, f"export FILE_TO_COVER='{source_file_path}'")
+        commands.insert(0, f"export TEST_FILE='{test_file_path}'")
+        command = " &amp;&amp; ".join(commands)
+    
+        logger.debug(f"UnitTestRunner: {command}")
+&gt;       test_result = subprocess.run(
+            command,
+            shell=True,
+            cwd=pathlib.Path.cwd(),
+            capture_output=True,
+            text=True
+        )
+E       TypeError: TestTestRunner.test_run_test_empty_commands.&lt;locals&gt;.fake_run() got an unexpected keyword argument 'capture_output'
+
+src/codebeaver/UnitTestRunner.py:33: TypeError</failure></testcase><testcase classname="tests.test_TestRunner.TestTestRunner" name="test_setup_empty_commands" time="0.002"><failure message="TypeError: TestTestRunner.test_setup_empty_commands.&lt;locals&gt;.fake_run() got an unexpected keyword argument 'capture_output'">self = &lt;tests.test_TestRunner.TestTestRunner object at 0x7fa6e2d3e110&gt;
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fa6e2342f90&gt;
+
+    def test_setup_empty_commands(self, monkeypatch):
+        """Test the behavior of setup when setup_commands list is empty."""
+        dummy_result = subprocess.CompletedProcess(args="", returncode=0)
+        recorded_command = []
+        def fake_run(command, shell, cwd):
+            recorded_command.append(command)
+            return dummy_result
+        monkeypatch.setattr(subprocess, "run", fake_run)
+        runner = UnitTestRunner(single_file_test_commands=[], setup_commands=[])
+&gt;       result = runner.setup()
+
+tests/test_TestRunner.py:88: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;codebeaver.UnitTestRunner.UnitTestRunner object at 0x7fa6e2340c10&gt;
+
+    def setup(self) -&gt; subprocess.CompletedProcess:
+        commands = self.setup_commands.copy()
+        command = " &amp;&amp; ".join(commands)
+&gt;       setup_result = subprocess.run(command, shell=True, cwd=pathlib.Path.cwd(), capture_output=True, text=True)
+E       TypeError: TestTestRunner.test_setup_empty_commands.&lt;locals&gt;.fake_run() got an unexpected keyword argument 'capture_output'
+
+src/codebeaver/UnitTestRunner.py:17: TypeError</failure></testcase><testcase classname="tests.test_TestRunner.TestTestRunner" name="test_run_test_failure" time="0.003"><failure message="TypeError: TestTestRunner.test_run_test_failure.&lt;locals&gt;.fake_run() got an unexpected keyword argument 'capture_output'">self = &lt;tests.test_TestRunner.TestTestRunner object at 0x7fa6e2f1b890&gt;
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fa6e234dcd0&gt;
+capsys = &lt;_pytest.capture.CaptureFixture object at 0x7fa6e234c250&gt;
+
+    def test_run_test_failure(self, monkeypatch, capsys):
+        """Test that run_test returns a non-zero exit code on failure."""
+        dummy_result = subprocess.CompletedProcess(args="dummy", returncode=1)
+        recorded_command = []
+        def fake_run(command, shell, cwd):
+            recorded_command.append(command)
+            return dummy_result
+        monkeypatch.setattr(subprocess, "run", fake_run)
+        runner = UnitTestRunner(single_file_test_commands=["echo test"], setup_commands=[])
+        source_file = "src/error.py"
+        test_file = "tests/error_test.py"
+&gt;       result = runner.run_test(source_file, test_file)
+
+tests/test_TestRunner.py:104: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;codebeaver.UnitTestRunner.UnitTestRunner object at 0x7fa6e234e350&gt;
+source_file_path = 'src/error.py', test_file_path = 'tests/error_test.py'
+
+    def run_test(
+        self, source_file_path: Path, test_file_path: Path
+    ) -&gt; subprocess.CompletedProcess:
+        commands = self.single_file_test_commands.copy()
+        commands.insert(0, f"export FILE_TO_COVER='{source_file_path}'")
+        commands.insert(0, f"export TEST_FILE='{test_file_path}'")
+        command = " &amp;&amp; ".join(commands)
+    
+        logger.debug(f"UnitTestRunner: {command}")
+&gt;       test_result = subprocess.run(
+            command,
+            shell=True,
+            cwd=pathlib.Path.cwd(),
+            capture_output=True,
+            text=True
+        )
+E       TypeError: TestTestRunner.test_run_test_failure.&lt;locals&gt;.fake_run() got an unexpected keyword argument 'capture_output'
+
+src/codebeaver/UnitTestRunner.py:33: TypeError</failure></testcase><testcase classname="tests.test_TestRunner.TestTestRunner" name="test_run_test_special_chars" time="0.003"><failure message="TypeError: TestTestRunner.test_run_test_special_chars.&lt;locals&gt;.fake_run() got an unexpected keyword argument 'capture_output'">self = &lt;tests.test_TestRunner.TestTestRunner object at 0x7fa6e2f1be90&gt;
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fa6e24a1d50&gt;
+capsys = &lt;_pytest.capture.CaptureFixture object at 0x7fa6e24a0a90&gt;
+
+    def test_run_test_special_chars(self, monkeypatch, capsys):
+        """Test run_test with file paths containing special characters and spaces."""
+        dummy_result = subprocess.CompletedProcess(args="dummy", returncode=0)
+        recorded_command = []
+        def fake_run(command, shell, cwd):
+            recorded_command.append(command)
+            return dummy_result
+        monkeypatch.setattr(subprocess, "run", fake_run)
+        special_source = "src/special file's test.py"
+        special_test = "tests/test file.txt"
+        runner = UnitTestRunner(single_file_test_commands=["echo Special"], setup_commands=[])
+&gt;       result = runner.run_test(special_source, special_test)
+
+tests/test_TestRunner.py:125: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;codebeaver.UnitTestRunner.UnitTestRunner object at 0x7fa6e24a3690&gt;
+source_file_path = "src/special file's test.py"
+test_file_path = 'tests/test file.txt'
+
+    def run_test(
+        self, source_file_path: Path, test_file_path: Path
+    ) -&gt; subprocess.CompletedProcess:
+        commands = self.single_file_test_commands.copy()
+        commands.insert(0, f"export FILE_TO_COVER='{source_file_path}'")
+        commands.insert(0, f"export TEST_FILE='{test_file_path}'")
+        command = " &amp;&amp; ".join(commands)
+    
+        logger.debug(f"UnitTestRunner: {command}")
+&gt;       test_result = subprocess.run(
+            command,
+            shell=True,
+            cwd=pathlib.Path.cwd(),
+            capture_output=True,
+            text=True
+        )
+E       TypeError: TestTestRunner.test_run_test_special_chars.&lt;locals&gt;.fake_run() got an unexpected keyword argument 'capture_output'
+
+src/codebeaver/UnitTestRunner.py:33: TypeError</failure></testcase><testcase classname="tests.test_TestRunner.TestTestRunner" name="test_run_test_empty_file_paths" time="0.003"><failure message="TypeError: TestTestRunner.test_run_test_empty_file_paths.&lt;locals&gt;.fake_run() got an unexpected keyword argument 'capture_output'">self = &lt;tests.test_TestRunner.TestTestRunner object at 0x7fa6e2f183d0&gt;
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fa6e234fdd0&gt;
+capsys = &lt;_pytest.capture.CaptureFixture object at 0x7fa6e234fa50&gt;
+
+    def test_run_test_empty_file_paths(self, monkeypatch, capsys):
+        """Test run_test behavior when provided empty file paths."""
+        dummy_result = subprocess.CompletedProcess(args="", returncode=0)
+        recorded_command = []
+        def fake_run(command, shell, cwd):
+            recorded_command.append(command)
+            return dummy_result
+        monkeypatch.setattr(subprocess, "run", fake_run)
+        runner = UnitTestRunner(single_file_test_commands=["echo test_empty"], setup_commands=[])
+&gt;       result = runner.run_test("", "")
+
+tests/test_TestRunner.py:142: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;codebeaver.UnitTestRunner.UnitTestRunner object at 0x7fa6e234da90&gt;
+source_file_path = '', test_file_path = ''
+
+    def run_test(
+        self, source_file_path: Path, test_file_path: Path
+    ) -&gt; subprocess.CompletedProcess:
+        commands = self.single_file_test_commands.copy()
+        commands.insert(0, f"export FILE_TO_COVER='{source_file_path}'")
+        commands.insert(0, f"export TEST_FILE='{test_file_path}'")
+        command = " &amp;&amp; ".join(commands)
+    
+        logger.debug(f"UnitTestRunner: {command}")
+&gt;       test_result = subprocess.run(
+            command,
+            shell=True,
+            cwd=pathlib.Path.cwd(),
+            capture_output=True,
+            text=True
+        )
+E       TypeError: TestTestRunner.test_run_test_empty_file_paths.&lt;locals&gt;.fake_run() got an unexpected keyword argument 'capture_output'
+
+src/codebeaver/UnitTestRunner.py:33: TypeError</failure></testcase><testcase classname="tests.test_TestRunner.TestTestRunner" name="test_run_test_cwd" time="0.002"><failure message="TypeError: TestTestRunner.test_run_test_cwd.&lt;locals&gt;.fake_run() got an unexpected keyword argument 'capture_output'">self = &lt;tests.test_TestRunner.TestTestRunner object at 0x7fa6e2f18810&gt;
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fa6e24a0c10&gt;
+
+    def test_run_test_cwd(self, monkeypatch):
+        """Test that run_test is executed with the current working directory."""
+        # Import pathlib locally to compare with the cwd parameter.
+        import pathlib
+        dummy_result = subprocess.CompletedProcess(args="dummy", returncode=0)
+        def fake_run(command, shell, cwd):
+            # Verify that cwd is set to the current directory.
+            assert cwd == pathlib.Path.cwd()
+            return dummy_result
+        monkeypatch.setattr(subprocess, "run", fake_run)
+        runner = UnitTestRunner(single_file_test_commands=["echo cwd"], setup_commands=[])
+&gt;       result = runner.run_test("src/file.py", "tests/file_test.py")
+
+tests/test_TestRunner.py:162: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;codebeaver.UnitTestRunner.UnitTestRunner object at 0x7fa6e24a12d0&gt;
+source_file_path = 'src/file.py', test_file_path = 'tests/file_test.py'
+
+    def run_test(
+        self, source_file_path: Path, test_file_path: Path
+    ) -&gt; subprocess.CompletedProcess:
+        commands = self.single_file_test_commands.copy()
+        commands.insert(0, f"export FILE_TO_COVER='{source_file_path}'")
+        commands.insert(0, f"export TEST_FILE='{test_file_path}'")
+        command = " &amp;&amp; ".join(commands)
+    
+        logger.debug(f"UnitTestRunner: {command}")
+&gt;       test_result = subprocess.run(
+            command,
+            shell=True,
+            cwd=pathlib.Path.cwd(),
+            capture_output=True,
+            text=True
+        )
+E       TypeError: TestTestRunner.test_run_test_cwd.&lt;locals&gt;.fake_run() got an unexpected keyword argument 'capture_output'
+
+src/codebeaver/UnitTestRunner.py:33: TypeError</failure></testcase><testcase classname="tests.test_TestRunner.TestTestRunner" name="test_setup_does_not_modify_commands" time="0.002"><failure message="TypeError: TestTestRunner.test_setup_does_not_modify_commands.&lt;locals&gt;.fake_run() got an unexpected keyword argument 'capture_output'">self = &lt;tests.test_TestRunner.TestTestRunner object at 0x7fa6e2f18b10&gt;
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fa6e24b6310&gt;
+
+    def test_setup_does_not_modify_commands(self, monkeypatch):
+        """Test that setup method does not modify the setup_commands list."""
+        original_commands = ["echo original1", "echo original2"]
+        dummy_result = subprocess.CompletedProcess(args="dummy", returncode=0)
+    
+        def fake_run(command, shell, cwd):
+            return dummy_result
+    
+        monkeypatch.setattr(subprocess, "run", fake_run)
+        runner = UnitTestRunner(single_file_test_commands=[], setup_commands=original_commands.copy())
+&gt;       result = runner.setup()
+
+tests/test_TestRunner.py:174: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;codebeaver.UnitTestRunner.UnitTestRunner object at 0x7fa6e24b4990&gt;
+
+    def setup(self) -&gt; subprocess.CompletedProcess:
+        commands = self.setup_commands.copy()
+        command = " &amp;&amp; ".join(commands)
+&gt;       setup_result = subprocess.run(command, shell=True, cwd=pathlib.Path.cwd(), capture_output=True, text=True)
+E       TypeError: TestTestRunner.test_setup_does_not_modify_commands.&lt;locals&gt;.fake_run() got an unexpected keyword argument 'capture_output'
+
+src/codebeaver/UnitTestRunner.py:17: TypeError</failure></testcase><testcase classname="tests.test_TestRunner.TestTestRunner" name="test_run_test_does_not_modify_commands" time="0.003"><failure message="TypeError: TestTestRunner.test_run_test_does_not_modify_commands.&lt;locals&gt;.fake_run() got an unexpected keyword argument 'capture_output'">self = &lt;tests.test_TestRunner.TestTestRunner object at 0x7fa6e2f19990&gt;
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x7fa6e24c9890&gt;
+capsys = &lt;_pytest.capture.CaptureFixture object at 0x7fa6e24cbc10&gt;
+
+    def test_run_test_does_not_modify_commands(self, monkeypatch, capsys):
+        """Test that run_test method does not modify single_file_test_commands list."""
+        original_commands = ["echo run_test1", "echo run_test2"]
+        dummy_result = subprocess.CompletedProcess(args="dummy", returncode=0)
+        recorded_command = []
+    
+        def fake_run(command, shell, cwd):
+            recorded_command.append(command)
+            return dummy_result
+    
+        monkeypatch.setattr(subprocess, "run", fake_run)
+        runner = UnitTestRunner(single_file_test_commands=original_commands.copy(), setup_commands=[])
+&gt;       result = runner.run_test("src/dummy.py", "tests/dummy_test.py")
+
+tests/test_TestRunner.py:191: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = &lt;codebeaver.UnitTestRunner.UnitTestRunner object at 0x7fa6e24c85d0&gt;
+source_file_path = 'src/dummy.py', test_file_path = 'tests/dummy_test.py'
+
+    def run_test(
+        self, source_file_path: Path, test_file_path: Path
+    ) -&gt; subprocess.CompletedProcess:
+        commands = self.single_file_test_commands.copy()
+        commands.insert(0, f"export FILE_TO_COVER='{source_file_path}'")
+        commands.insert(0, f"export TEST_FILE='{test_file_path}'")
+        command = " &amp;&amp; ".join(commands)
+    
+        logger.debug(f"UnitTestRunner: {command}")
+&gt;       test_result = subprocess.run(
+            command,
+            shell=True,
+            cwd=pathlib.Path.cwd(),
+            capture_output=True,
+            text=True
+        )
+E       TypeError: TestTestRunner.test_run_test_does_not_modify_commands.&lt;locals&gt;.fake_run() got an unexpected keyword argument 'capture_output'
+
+src/codebeaver/UnitTestRunner.py:33: TypeError</failure></testcase><testcase classname="tests.test_anthropic" name="test_constructor_valid" time="0.002" /><testcase classname="tests.test_anthropic" name="test_constructor_invalid_model" time="0.002" /><testcase classname="tests.test_anthropic" name="test_missing_api_key" time="0.002" /><testcase classname="tests.test_anthropic" name="test_create_chat_completion_success" time="0.002" /><testcase classname="tests.test_anthropic" name="test_create_chat_completion_extended_header" time="0.002" /><testcase classname="tests.test_anthropic" name="test_create_chat_completion_failure" time="0.002" /><testcase classname="tests.test_anthropic" name="test_get_available_models" time="0.002" /><testcase classname="tests.test_anthropic" name="test_get_model_info_normal" time="0.002" /><testcase classname="tests.test_anthropic" name="test_get_model_info_latest" time="0.002" /><testcase classname="tests.test_anthropic" name="test_get_model_info_invalid" time="0.002" /><testcase classname="tests.test_cli" name="test_version" time="0.009" /><testcase classname="tests.test_cli" name="test_help" time="0.010" /><testcase classname="tests.test_cli" name="test_missing_api_key" time="0.009" /><testcase classname="tests.test_cli" name="test_invalid_template" time="0.010"><failure message="assert &quot;invalid choice: 'invalid_template'&quot; in &quot;usage: __main__.py [-h] [--version] [-v] {unit,e2e} ...\n__main__.py: error: argument command: invalid choice: 'run' (choose from 'unit', 'e2e')\n&quot;&#10; +  where &quot;usage: __main__.py [-h] [--version] [-v] {unit,e2e} ...\n__main__.py: error: argument command: invalid choice: 'run' (choose from 'unit', 'e2e')\n&quot; = CaptureResult(out='', err=&quot;usage: __main__.py [-h] [--version] [-v] {unit,e2e} ...\n__main__.py: error: argument command: invalid choice: 'run' (choose from 'unit', 'e2e')\n&quot;).err">capsys = &lt;_pytest.capture.CaptureFixture object at 0x7fa6e23f1c50&gt;
+mock_env = None, temp_file = '/tmp/tmp3u1cenbn'
+
+    def test_invalid_template(capsys, mock_env, temp_file):
+        """Test that invalid template raises an error."""
+        with pytest.raises(SystemExit) as exc_info:
+            cli.main(["run", "invalid_template", temp_file])
+        assert exc_info.value.code == 2  # argparse exits with code 2 for invalid choice
+        captured = capsys.readouterr()
+&gt;       assert "invalid choice: 'invalid_template'" in captured.err
+E       assert "invalid choice: 'invalid_template'" in "usage: __main__.py [-h] [--version] [-v] {unit,e2e} ...\n__main__.py: error: argument command: invalid choice: 'run' (choose from 'unit', 'e2e')\n"
+E        +  where "usage: __main__.py [-h] [--version] [-v] {unit,e2e} ...\n__main__.py: error: argument command: invalid choice: 'run' (choose from 'unit', 'e2e')\n" = CaptureResult(out='', err="usage: __main__.py [-h] [--version] [-v] {unit,e2e} ...\n__main__.py: error: argument command: invalid choice: 'run' (choose from 'unit', 'e2e')\n").err
+
+tests/test_cli.py:61: AssertionError</failure></testcase><testcase classname="tests.test_cli" name="test_nonexistent_file" time="0.009"><failure message="assert 'File not found: nonexistent_file.py' in &quot;usage: __main__.py [-h] [--version] [-v] {unit,e2e} ...\n__main__.py: error: argument command: invalid choice: 'run' (choose from 'unit', 'e2e')\n&quot;&#10; +  where &quot;usage: __main__.py [-h] [--version] [-v] {unit,e2e} ...\n__main__.py: error: argument command: invalid choice: 'run' (choose from 'unit', 'e2e')\n&quot; = CaptureResult(out='', err=&quot;usage: __main__.py [-h] [--version] [-v] {unit,e2e} ...\n__main__.py: error: argument command: invalid choice: 'run' (choose from 'unit', 'e2e')\n&quot;).err">capsys = &lt;_pytest.capture.CaptureFixture object at 0x7fa6e2340a50&gt;
+mock_env = None
+
+    def test_nonexistent_file(capsys, mock_env):
+        """Test that nonexistent file raises an error."""
+        with pytest.raises(SystemExit) as exc_info:
+            cli.main(["run", "pytest", "nonexistent_file.py"])
+        assert exc_info.value.code == 2  # argparse exits with code 2 for invalid argument
+        captured = capsys.readouterr()
+&gt;       assert "File not found: nonexistent_file.py" in captured.err
+E       assert 'File not found: nonexistent_file.py' in "usage: __main__.py [-h] [--version] [-v] {unit,e2e} ...\n__main__.py: error: argument command: invalid choice: 'run' (choose from 'unit', 'e2e')\n"
+E        +  where "usage: __main__.py [-h] [--version] [-v] {unit,e2e} ...\n__main__.py: error: argument command: invalid choice: 'run' (choose from 'unit', 'e2e')\n" = CaptureResult(out='', err="usage: __main__.py [-h] [--version] [-v] {unit,e2e} ...\n__main__.py: error: argument command: invalid choice: 'run' (choose from 'unit', 'e2e')\n").err
+
+tests/test_cli.py:70: AssertionError</failure></testcase><testcase classname="tests.test_cli" name="test_run_command_missing_args" time="0.009"><failure message="assert 'the following arguments are required: template, file_path' in &quot;usage: __main__.py [-h] [--version] [-v] {unit,e2e} ...\n__main__.py: error: argument command: invalid choice: 'run' (choose from 'unit', 'e2e')\n&quot;&#10; +  where &quot;usage: __main__.py [-h] [--version] [-v] {unit,e2e} ...\n__main__.py: error: argument command: invalid choice: 'run' (choose from 'unit', 'e2e')\n&quot; = CaptureResult(out='', err=&quot;usage: __main__.py [-h] [--version] [-v] {unit,e2e} ...\n__main__.py: error: argument command: invalid choice: 'run' (choose from 'unit', 'e2e')\n&quot;).err">capsys = &lt;_pytest.capture.CaptureFixture object at 0x7fa6e24bc4d0&gt;
+mock_env = None
+
+    def test_run_command_missing_args(capsys, mock_env):
+        """Test the run command with missing arguments."""
+        with pytest.raises(SystemExit) as exc_info:
+            cli.main(["run"])
+        assert exc_info.value.code == 2  # argparse exits with code 2 for missing arguments
+        captured = capsys.readouterr()
+&gt;       assert "the following arguments are required: template, file_path" in captured.err
+E       assert 'the following arguments are required: template, file_path' in "usage: __main__.py [-h] [--version] [-v] {unit,e2e} ...\n__main__.py: error: argument command: invalid choice: 'run' (choose from 'unit', 'e2e')\n"
+E        +  where "usage: __main__.py [-h] [--version] [-v] {unit,e2e} ...\n__main__.py: error: argument command: invalid choice: 'run' (choose from 'unit', 'e2e')\n" = CaptureResult(out='', err="usage: __main__.py [-h] [--version] [-v] {unit,e2e} ...\n__main__.py: error: argument command: invalid choice: 'run' (choose from 'unit', 'e2e')\n").err
+
+tests/test_cli.py:79: AssertionError</failure></testcase><testcase classname="tests.test_cli" name="test_run_command_no_args" time="0.007" /><testcase classname="tests.test_cli" name="test_run_command_with_correct_args_but_invalid_setup" time="0.009"><failure message="assert 2 == 1&#10; +  where 2 = SystemExit(2).code&#10; +    where SystemExit(2) = &lt;ExceptionInfo SystemExit(2) tblen=6&gt;.value">capsys = &lt;_pytest.capture.CaptureFixture object at 0x7fa6e24c3fd0&gt;
+mock_env = None, temp_file = '/tmp/tmpdir1bqz2'
+
+    def test_run_command_with_correct_args_but_invalid_setup(capsys, mock_env, temp_file):
+        """Test the run command with correct arguments."""
+        with pytest.raises(SystemExit) as exc_info:
+            cli.main(["run", "pytest", temp_file])
+        # captured = capsys.readouterr()
+&gt;       assert exc_info.value.code == 1
+E       assert 2 == 1
+E        +  where 2 = SystemExit(2).code
+E        +    where SystemExit(2) = &lt;ExceptionInfo SystemExit(2) tblen=6&gt;.value
+
+tests/test_cli.py:96: AssertionError</failure></testcase><testcase classname="tests.test_cli" name="test_run_command_with_correct_args_and_correct_setup" time="8.592" /><testcase classname="tests.test_deepseek" name="test_init_without_api_key" time="0.003" /><testcase classname="tests.test_deepseek" name="test_invalid_model" time="0.002" /><testcase classname="tests.test_deepseek" name="test_get_available_models" time="0.002" /><testcase classname="tests.test_deepseek" name="test_get_model_info_known" time="0.002" /><testcase classname="tests.test_deepseek" name="test_get_model_info_unknown" time="0.002" /><testcase classname="tests.test_deepseek" name="test_create_chat_completion_success" time="0.002" /><testcase classname="tests.test_deepseek" name="test_create_chat_completion_error" time="0.003" /><testcase classname="tests.test_mistral.TestMistralProvider" name="test_get_base_model_alias" time="0.002" /><testcase classname="tests.test_mistral.TestMistralProvider" name="test_get_base_model_non_alias" time="0.002" /><testcase classname="tests.test_mistral.TestMistralProvider" name="test_invalid_model_raises_error" time="0.002" /><testcase classname="tests.test_mistral.TestMistralProvider" name="test_missing_api_key_raises_error" time="0.002" /><testcase classname="tests.test_mistral.TestMistralProvider" name="test_create_chat_completion_success" time="0.002" /><testcase classname="tests.test_mistral.TestMistralProvider" name="test_create_chat_completion_exception" time="0.002" /><testcase classname="tests.test_mistral.TestMistralProvider" name="test_get_available_models" time="0.002" /><testcase classname="tests.test_mistral.TestMistralProvider" name="test_get_model_info_valid" time="0.002" /><testcase classname="tests.test_mistral.TestMistralProvider" name="test_get_model_info_invalid" time="0.002" /><testcase classname="tests.test_ollama.TestOllamaProvider" name="test_valid_model_init" time="0.001" /><testcase classname="tests.test_ollama.TestOllamaProvider" name="test_invalid_model_init" time="0.002" /><testcase classname="tests.test_ollama.TestOllamaProvider" name="test_get_available_models" time="0.001" /><testcase classname="tests.test_ollama.TestOllamaProvider" name="test_get_model_info_valid" time="0.001" /><testcase classname="tests.test_ollama.TestOllamaProvider" name="test_get_model_info_unknown" time="0.001" /><testcase classname="tests.test_ollama.TestOllamaProvider" name="test_create_chat_completion_success" time="0.002" /><testcase classname="tests.test_ollama.TestOllamaProvider" name="test_create_chat_completion_failure" time="0.002" /><testcase classname="tests.test_openai" name="test_invalid_api_key" time="0.002" /><testcase classname="tests.test_openai" name="test_valid_provider_default_model" time="0.002" /><testcase classname="tests.test_openai" name="test_valid_provider_with_alias" time="0.002" /><testcase classname="tests.test_openai" name="test_invalid_model" time="0.002" /><testcase classname="tests.test_openai" name="test_create_chat_completion_success" time="0.135" /><testcase classname="tests.test_openai" name="test_create_chat_completion_exception" time="0.003" /><testcase classname="tests.test_openai" name="test_get_available_models" time="0.002" /><testcase classname="tests.test_openai" name="test_get_model_info_known_model" time="0.001" /><testcase classname="tests.test_openai" name="test_get_model_info_unknown_model" time="0.001" /><testcase classname="tests.test_openai" name="test_gpt_model_get_base_model" time="0.002" /><testcase classname="tests.test_types" name="test_test_error_type_values" time="0.001" /><testcase classname="tests.test_types" name="test_end2end_test_defaults" time="0.001" /><testcase classname="tests.test_types" name="test_end2end_test_missing_field" time="0.001" /><testcase classname="tests.test_types" name="test_test_case_initialization" time="0.001" /><testcase classname="tests.test_types" name="test_test_case_validation_error" time="0.001" /><testcase classname="tests.test_types" name="test_end2end_test_invalid_steps_type" time="0.001" /><testcase classname="tests.test_types" name="test_end2end_test_extra_field" time="0.001" /><testcase classname="tests.test_types" name="test_end2end_test_dict_method" time="0.003" /><testcase classname="tests.test_types" name="test_test_case_extra_field" time="0.001" /><testcase classname="tests.test_types" name="test_test_case_to_dict" time="0.001" /><testcase classname="tests.test_types" name="test_test_case_update" time="0.001" /><testcase classname="tests.test_types" name="test_end2end_test_json_method" time="0.002" /><testcase classname="tests.test_types" name="test_test_case_invalid_failure_type" time="0.001" /><testcase classname="tests.test_types" name="test_test_case_parse_obj" time="0.001" /><testcase classname="tests.test_types" name="test_end2end_test_steps_must_all_be_strings" time="0.002" /></testsuite></testsuites>
