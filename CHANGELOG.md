@@ -1,3 +1,18 @@
+## [1.1.0](https://github.com/codebeaver-ai/codebeaver-ai/compare/v1.0.0...v1.1.0) (2025-03-26)
+
+
+### Features
+
+* add multi model suport ([ae27d19](https://github.com/codebeaver-ai/codebeaver-ai/commit/ae27d198ef20a12a859e5ab22884df9f72e3072f))
+* add new regex ([74dd163](https://github.com/codebeaver-ai/codebeaver-ai/commit/74dd1630b92e5be7f2b632846421fc5bbcca2826))
+* add support for ollama ([1e85a97](https://github.com/codebeaver-ai/codebeaver-ai/commit/1e85a9732eeb993ce81a723f5a812b95e6696d82))
+
+
+### Test
+
+* Add coverage improvement test for tests/test_ContentCleaner.py ([1a77a41](https://github.com/codebeaver-ai/codebeaver-ai/commit/1a77a419bbf7d80e182264dd205347c43bb0e29c))
+* Update coverage improvement test for tests/test_E2E.py ([48e1338](https://github.com/codebeaver-ai/codebeaver-ai/commit/48e1338de835994147fb97cc61398cf3ab187559))
+
 ## [0.1.2] - 2025-03-26
 
 ### Added
